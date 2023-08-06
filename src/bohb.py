@@ -44,6 +44,7 @@ def get_bohb_workers(
     n_actual_evals_in_opt: int,
     n_evals: int,
     seed: int,
+    tmp_dir: str | None,
 ) -> list[BOHBWorker]:
     kwargs = dict(
         obj_func=obj_func,
@@ -54,6 +55,7 @@ def get_bohb_workers(
         n_actual_evals_in_opt=n_actual_evals_in_opt,
         n_evals=n_evals,
         seed=seed,
+        tmp_dir=tmp_dir,
     )
     bohb_workers = []
     for i, w in enumerate(get_multiple_wrappers(**kwargs)):
@@ -73,6 +75,7 @@ def run_bohb(
     fidel_key: str,
     seed: int,
     n_workers: int,
+    tmp_dir: str | None,
     run_id: str = "bohb-run",
     ns_host: str = "127.0.0.1",
     n_evals: int = 450,  # eta=3,S=2,100 full evals
@@ -91,6 +94,7 @@ def run_bohb(
         n_actual_evals_in_opt=n_evals + n_workers,
         n_evals=n_evals,
         seed=seed,
+        tmp_dir=tmp_dir,
     )
     bohb = BOHB(
         configspace=config_space,
@@ -120,4 +124,5 @@ if __name__ == "__main__":
         n_workers=args.n_workers,
         save_dir_name=os.path.join("bohb", save_dir_name),
         seed=args.seed,
+        tmp_dir=args.tmp_dir,
     )

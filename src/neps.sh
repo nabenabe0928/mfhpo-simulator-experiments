@@ -30,16 +30,19 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
+        --tmp_dir)
+            tmp_dir="$2"
+            shift
+            shift
+            ;;
         *)
             shift
             ;;
     esac
 done
 
-rm -r neps-log  # Here must be adapted to the exact log directory name.
-
 for num in `seq 1 ${n_workers}`; do
-    python -m src.neps --seed $seed --dataset_id $dataset_id --bench_name $bench_name --n_workers $n_workers --worker_index $((num - 1)) &
+    python -m src.neps --seed $seed --dataset_id $dataset_id --bench_name $bench_name --n_workers $n_workers --worker_index $((num - 1)) --tmp_dir "${tmp_dir}" &
     pids[${num}]=$!
     echo "Start Proc. $num"
 done

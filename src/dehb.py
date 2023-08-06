@@ -32,6 +32,7 @@ def run_dehb(
     fidel_key: str,
     n_workers: int,
     seed: int,
+    tmp_dir: str | None,
     n_evals: int = 450,  # eta=3,S=2,100 full evals
 ) -> None:
     np.random.seed(seed)
@@ -45,6 +46,7 @@ def run_dehb(
         continual_max_fidel=max_fidel,
         fidel_keys=[fidel_key],
         seed=seed,
+        tmp_dir=tmp_dir,
     )
 
     dehb = DEHB(
@@ -77,4 +79,5 @@ if __name__ == "__main__":
         n_workers=args.n_workers,
         save_dir_name=os.path.join("dehb", save_dir_name),
         seed=args.seed,
+        tmp_dir=args.tmp_dir,
     )

@@ -1,3 +1,33 @@
+while [[ $# -gt 0 ]]; do
+    key="$1"
+
+    case $key in
+        --mode)
+            mode="$2"
+            shift
+            shift
+            ;;
+        --seed_start)
+            seed_start="$2"
+            shift
+            shift
+            ;;
+        --seed_end)
+            seed_end="$2"
+            shift
+            shift
+            ;;
+        --n_workers)
+            n_workers="$2"
+            shift
+            shift
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
 run_bench () {
     subcmd=${1}
 
@@ -33,20 +63,24 @@ run_opt () {
     declare -A exec_cmds
     exec_cmds["bohb"]="python -m src.bohb"
     exec_cmds["dehb"]="python -m src.dehb"
+    exec_cmds["smac"]="python -m src.smac"
     exec_cmds["neps"]="./src/neps.sh"
 
     exec_cmd=${exec_cmds[$opt_name]}
-    for seed in `seq 0 9`
+    for seed in `seq ${seed_start} ${seed_end}`
     do
-        for n_workers in 1 2 4 8 16 32 64
-        do
-            subcmd="${exec_cmd} --seed ${seed} --n_workers ${n_workers}"
-            run_bench "$subcmd"
-        done
+        subcmd="${exec_cmd} --seed ${seed} --n_workers ${n_workers}"
+        run_bench "$subcmd"
     done
 }
 
-for opt_name in "bohb" "dehb" "neps"
-do
-    run_opt ${opt_name}
-done
+if [[ "$mode" == "smac" ]]
+then
+    run_opt "smac"
+else
+    for opt_name in "bohb" "dehb" "neps"
+    do
+        run_opt ${opt_name}
+    done
+fi
+

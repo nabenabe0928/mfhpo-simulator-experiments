@@ -37,6 +37,7 @@ def run_smac(
     fidel_key: list[str],
     seed: int,
     n_workers: int,
+    tmp_dir: str | None,
     n_init: int = 5,
     n_evals: int = 450,  # eta=3,S=2,100 full evals
 ) -> None:
@@ -57,6 +58,7 @@ def run_smac(
         seed=seed,
         fidel_keys=[fidel_key],
         continual_max_fidel=max_fidel,
+        tmp_dir=tmp_dir,
     )
     smac = MFFacade(
         scenario,
@@ -88,4 +90,5 @@ if __name__ == "__main__":
         n_workers=args.n_workers,
         save_dir_name=os.path.join("smac", save_dir_name),
         seed=args.seed,
+        tmp_dir=args.tmp_dir,
     )

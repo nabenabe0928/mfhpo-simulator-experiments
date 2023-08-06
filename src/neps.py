@@ -48,6 +48,7 @@ def run_neps(
     worker_index: int,
     n_workers: int,
     seed: int,
+    tmp_dir: str | None,
     n_evals: int = 450,  # eta=3,S=2,100 full evals
 ):
     np.random.seed(seed)
@@ -62,6 +63,7 @@ def run_neps(
         fidel_keys=[fidel_key],
         continual_max_fidel=max_fidel,
         seed=seed,
+        tmp_dir=tmp_dir,
         worker_index=worker_index,
     )
     pipeline_space = get_pipeline_space(config_space)
@@ -90,5 +92,6 @@ if __name__ == "__main__":
         n_workers=args.n_workers,
         save_dir_name=os.path.join("neps", save_dir_name),
         seed=args.seed,
+        tmp_dir=args.tmp_dir,
         worker_index=args.worker_index,
     )

@@ -18,6 +18,7 @@ class ParsedArgs:
     bench_name: str
     n_workers: int
     worker_index: int | None
+    tmp_dir: str | None
 
 
 def parse_args() -> ParsedArgs:
@@ -27,6 +28,7 @@ def parse_args() -> ParsedArgs:
     parser.add_argument("--dim", type=int, default=3, choices=[3, 6], help="Only for Hartmann")
     parser.add_argument("--bench_name", type=str, choices=list(BENCH_CHOICES.keys()))
     parser.add_argument("--n_workers", type=int)
+    parser.add_argument("--tmp_dir", type=str, default=None)
     parser.add_argument("--worker_index", type=int, default=None)
     args = parser.parse_args()
 
