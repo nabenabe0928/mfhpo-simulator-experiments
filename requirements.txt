@@ -1,0 +1,19 @@
+mfhpo-simulator>=1.2.9
+
+# BOHB
+hpbandster==0.7.4
+
+# DEHB
+dehb==0.0.5
+
+# NEPS
+neural-pipeline-search==0.8.3
+
+# Optuna
+optuna==3.1.0
+
+# Benchmark
+mfhpo-benchmark-api[full]>=2.0.2
+
+# Important dependencies
+distributed==2023.5.0
