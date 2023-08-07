@@ -1,3 +1,5 @@
+#!/bin/bash -l
+
 dim=3
 dataset_id=0
 

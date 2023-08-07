@@ -1,3 +1,5 @@
+#!/bin/bash -l
+
 for seed in `seq 0 49`
 do
     for n_workers in 1 2 4 8 16

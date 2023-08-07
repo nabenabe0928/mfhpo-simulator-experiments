@@ -1,3 +1,5 @@
+#!/bin/bash -l
+
 while [[ $# -gt 0 ]]; do
     key="$1"
 
@@ -44,7 +46,7 @@ run_bench () {
             cmd="${subcmd} --bench_name ${bench_name} --dataset_id ${dataset_id}"
             echo `date '+%y/%m/%d %H:%M:%S'`
             echo $cmd
-            $cmd
+            # $cmd
         done
     done
 
@@ -53,7 +55,7 @@ run_bench () {
         cmd="${subcmd} ${subcmd2}"
         echo `date '+%y/%m/%d %H:%M:%S'`
         echo $cmd
-        $cmd
+        # $cmd
     done
 }
 

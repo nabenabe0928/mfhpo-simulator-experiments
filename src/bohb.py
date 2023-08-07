@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 from typing import Any
 
@@ -14,6 +15,9 @@ from hpbandster.optimizers import BOHB
 import numpy as np
 
 from src.utils import get_bench_instance, get_save_dir_name, parse_args
+
+
+logging.getLogger("hpbandster").setLevel(logging.CRITICAL)
 
 
 class BOHBWorker(Worker):

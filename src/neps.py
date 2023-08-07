@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import warnings
 from typing import Any
 
 import ConfigSpace as CS
@@ -12,6 +13,9 @@ import neps
 import numpy as np
 
 from src.utils import get_bench_instance, get_save_dir_name, parse_args
+
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 class NEPSWorker(ObjectiveFuncWrapper):
