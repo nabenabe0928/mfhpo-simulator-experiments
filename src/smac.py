@@ -62,7 +62,7 @@ def run_smac(
     )
     smac = MFFacade(
         scenario,
-        wrapper,
+        wrapper.__call__,  # SMAC raises an error when using wrapper, so we use wrapper.__call__ instead.
         initial_design=MFFacade.get_initial_design(scenario, n_configs=n_init),
         intensifier=Hyperband(scenario, incumbent_selection="highest_budget"),
         overwrite=True,
