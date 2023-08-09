@@ -6,8 +6,64 @@ from typing import Any
 
 from benchmark_apis import HPOLib, JAHSBench201, LCBench, MFBranin, MFHartmann
 
+from benchmark_simulator import ObjectiveFuncWrapper
+
+import ConfigSpace as CS
+
+import optuna
+
 
 BENCH_CHOICES = dict(lc=LCBench, hpolib=HPOLib, jahs=JAHSBench201, branin=MFBranin, hartmann=MFHartmann)
+
+
+class OptunaObjectiveFuncWrapper(ObjectiveFuncWrapper):
+    def set_config_space(self, config_space: CS.ConfigurationSpace) -> None:
+        self.config_space = config_space
+
+    def __call__(
+        self,
+        trial: optuna.Trial,
+    ) -> float:
+        eval_config: dict[str, Any] = {}
+        for name in self.config_space:
+            hp = self.config_space.get_hyperparameter(name)
+            if isinstance(hp, CS.CategoricalHyperparameter):
+                eval_config[name] = trial.suggest_categorical(name, choices=hp.choices)
+            elif isinstance(hp, CS.UniformFloatHyperparameter) or hp.log:
+                dtype = float if isinstance(hp, CS.UniformFloatHyperparameter) else int
+                eval_config[name] = dtype(trial.suggest_float(name, low=hp.lower, high=hp.upper, log=hp.log))
+            elif isinstance(hp, CS.UniformIntegerHyperparameter):
+                eval_config[name] = trial.suggest_int(name, low=hp.lower, high=hp.upper)
+            else:
+                raise ValueError(f"{type(hp)} is not supported.")
+
+        output = super().__call__(eval_config)
+        return output[self.obj_keys[0]]
+
+
+def run_optuna(
+    obj_func: Any,
+    config_space: CS.ConfigurationSpace,
+    save_dir_name: str,
+    seed: int,
+    n_workers: int,
+    sampler: optuna.samplers.BaseSampler,
+    tmp_dir: str | None,
+    n_evals: int = 450,  # eta=3,S=2,100 full evals
+) -> None:
+    n_actual_evals_in_opt = n_evals + n_workers
+    wrapper = OptunaObjectiveFuncWrapper(
+        obj_func=obj_func,
+        n_workers=n_workers,
+        save_dir_name=save_dir_name,
+        n_actual_evals_in_opt=n_actual_evals_in_opt,
+        n_evals=n_evals,
+        seed=seed,
+        tmp_dir=tmp_dir,
+    )
+    wrapper.set_config_space(config_space=config_space)
+    study = optuna.create_study(sampler=sampler)
+    study.optimize(wrapper, n_trials=n_actual_evals_in_opt, n_jobs=n_workers)
 
 
 @dataclass(frozen=True)
@@ -49,12 +105,12 @@ def get_save_dir_name(args: ParsedArgs) -> str:
     return f"bench={bench_name}{dataset_part}_nworkers={args.n_workers}/{args.seed}"
 
 
-def get_bench_instance(args: ParsedArgs, keep_benchdata: bool = True) -> Any:
+def get_bench_instance(args: ParsedArgs, keep_benchdata: bool = True, use_fidel: bool = True) -> Any:
     bench_cls = BENCH_CHOICES[args.bench_name]
     if bench_cls._BENCH_TYPE == "HPO":
         obj_func = bench_cls(dataset_id=args.dataset_id, seed=args.seed, keep_benchdata=keep_benchdata)
     else:
         kwargs = dict(dim=args.dim) if args.bench_name == "hartmann" else dict()
-        obj_func = bench_cls(seed=args.seed, **kwargs)
+        obj_func = bench_cls(seed=args.seed, use_fidel=use_fidel, **kwargs)
 
     return obj_func

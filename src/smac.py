@@ -38,7 +38,7 @@ def run_smac(
     seed: int,
     n_workers: int,
     tmp_dir: str | None,
-    n_init: int = 5,
+    n_init_min: int = 5,
     n_evals: int = 450,  # eta=3,S=2,100 full evals
 ) -> None:
     n_actual_evals_in_opt = n_evals + n_workers
@@ -63,7 +63,7 @@ def run_smac(
     smac = MFFacade(
         scenario,
         wrapper.__call__,  # SMAC raises an error when using wrapper, so we use wrapper.__call__ instead.
-        initial_design=MFFacade.get_initial_design(scenario, n_configs=n_init),
+        initial_design=MFFacade.get_initial_design(scenario, n_configs=max(n_init_min, n_workers)),
         intensifier=Hyperband(scenario, incumbent_selection="highest_budget"),
         overwrite=True,
     )

@@ -12,8 +12,11 @@ neural-pipeline-search==0.8.3
 # Optuna
 optuna==3.1.0
 
+# HEBO
+HEBO==0.3.2
+
 # Benchmark
-mfhpo-benchmark-api[full]>=2.0.2
+mfhpo-benchmark-api[full]>=2.0.4
 
 # Important dependencies
 distributed==2023.5.0

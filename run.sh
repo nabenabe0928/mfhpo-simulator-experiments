@@ -66,6 +66,8 @@ run_opt () {
     exec_cmds["bohb"]="python -m src.bohb"
     exec_cmds["dehb"]="python -m src.dehb"
     exec_cmds["smac"]="python -m src.smac"
+    exec_cmds["random"]="python -m src.random"
+    exec_cmds["tpe"]="python -m src.tpe"
     exec_cmds["neps"]="./src/neps.sh"
 
     exec_cmd=${exec_cmds[$opt_name]}
@@ -80,7 +82,7 @@ if [[ "$mode" == "smac" ]]
 then
     run_opt "smac"
 else
-    for opt_name in "bohb" "dehb" "neps"
+    for opt_name in "bohb" "dehb" "neps" "random" "tpe"
     do
         run_opt ${opt_name}
     done

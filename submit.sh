@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-for seed in `seq 0 49`
+for seed in `seq 0 29`
 do
-    for n_workers in 1 2 4 8 16
+    for n_workers in 1 2 4 8
     do
         export SEED_START=${seed}
         export SEED_END=${seed}
