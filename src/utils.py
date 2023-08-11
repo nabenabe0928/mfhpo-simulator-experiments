@@ -10,7 +10,10 @@ from benchmark_simulator import ObjectiveFuncWrapper
 
 import ConfigSpace as CS
 
-import optuna
+try:
+    import optuna
+except ModuleNotFoundError:
+    pass
 
 
 BENCH_CHOICES = dict(lc=LCBench, hpolib=HPOLib, jahs=JAHSBench201, branin=MFBranin, hartmann=MFHartmann)
