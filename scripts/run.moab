@@ -1,7 +1,6 @@
 #!/bin/bash -l
-#MSUB -l nodes=1:ppn=20
 #MSUB -l walltime=96:00:00
-#MSUB -l pmem=128gb
+#MSUB -l pmem=15gb
 #MSUB -l naccesspolicy=singlejob
 
 module load tools/singularity/3.11
@@ -10,10 +9,18 @@ seed_start=${SEED_START}
 seed_end=${SEED_END}
 n_workers=${N_WORKERS}
 
+echo "### Running preparation ###"
+echo "From seed ${seed_start} to seed ${seed_end} with n_workers=${n_workers}"
+
 cd $HOME/master-thesis-experiment
 
-subcmd="./run.sh --seed_start ${seed_start} --seed_end ${seed_end} --n_workers ${n_workers} --tmp_dir ${TMPDIR}"
+subcmd="./scripts/run.sh --seed_start ${seed_start} --seed_end ${seed_end} --n_workers ${n_workers} --tmp_dir ${TMPDIR}"
 cmd="singularity exec mfhpo-simulator.sif ${subcmd}"
+echo $cmd
+$cmd
 cmd="singularity exec mfhpo-simulator-for-smac.sif ${subcmd} --mode smac"
+echo $cmd
+$cmd
 
+echo "Start the result synchronization"
 rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/

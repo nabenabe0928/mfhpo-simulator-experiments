@@ -1,12 +1,14 @@
 #!/bin/bash -l
 
-for seed in `seq 0 2`
+for seed in 0
 do
     for n_workers in 4 8
     do
-        export SEED_START=${seed}
-        export SEED_END=${seed}
-        export N_WORKERS=${n_workers}
-        msub test_run.moab
+        vars_to_use="-v SEED_START=${seed},SEED_END=${seed},N_WORKERS=${n_workers}"
+        resource="-l nodes=1:ppn=${n_workers}"
+
+        cmd="msub ${vars_to_use} ${resource} scripts/test_run.moab"
+        echo $cmd
+        $cmd
     done
 done

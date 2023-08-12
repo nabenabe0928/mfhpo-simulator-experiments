@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
-from benchmark_apis import HPOLib, JAHSBench201, LCBench, MFBranin, MFHartmann
+from benchmark_apis import HPOBench, HPOLib, JAHSBench201, LCBench, MFBranin, MFHartmann
 
 from benchmark_simulator import ObjectiveFuncWrapper
 
@@ -26,7 +26,9 @@ except ModuleNotFoundError:
     pass
 
 
-BENCH_CHOICES = dict(lc=LCBench, hpolib=HPOLib, jahs=JAHSBench201, branin=MFBranin, hartmann=MFHartmann)
+BENCH_CHOICES = dict(
+    lc=LCBench, hpobench=HPOBench, hpolib=HPOLib, jahs=JAHSBench201, branin=MFBranin, hartmann=MFHartmann
+)
 
 
 class OptunaObjectiveFuncWrapper(ObjectiveFuncWrapper):

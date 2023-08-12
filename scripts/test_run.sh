@@ -41,7 +41,7 @@ run_bench () {
 
     for bench_name in hpolib hpobench lc jahs
     do
-        for dataset_id in `seq 0 ${bench_max_id[$bench_name]}`
+        for dataset_id in 0
         do
             cmd="${subcmd} --bench_name ${bench_name} --dataset_id ${dataset_id}"
             echo `date '+%y/%m/%d %H:%M:%S'`
@@ -75,21 +75,15 @@ run_opt () {
     exec_cmd=${exec_cmds[$opt_name]}
     for seed in `seq ${seed_start} ${seed_end}`
     do
-        subcmd="${exec_cmd} --seed ${seed} --n_workers ${n_workers}"
+        subcmd="${exec_cmd} --seed ${seed} --n_workers ${n_workers} --tmp_dir ${TMPDIR}"
         run_bench "$subcmd"
     done
 }
 
-if [[ "$mode" == "smac" ]]
-then
-    run_opt "hyperband"
-    run_opt "smac"
-elif [[ "$mode" == "hebo" ]]
-then
-    run_opt "hebo"
-else
-    for opt_name in "bohb" "dehb" "neps" "random" "tpe"
-    do
-        run_opt ${opt_name}
-    done
-fi
+for opt_name in "random"
+do
+    run_opt ${opt_name}
+done
+
+echo `date '+%y/%m/%d %H:%M:%S'`
+echo "Finished test_run.sh!!"
