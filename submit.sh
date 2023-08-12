@@ -8,5 +8,6 @@ do
         export SEED_END=${seed}
         export N_WORKERS=${n_workers}
         msub run.moab
+        msub run_hebo.moab
     done
 done

@@ -46,7 +46,7 @@ run_bench () {
             cmd="${subcmd} --bench_name ${bench_name} --dataset_id ${dataset_id}"
             echo `date '+%y/%m/%d %H:%M:%S'`
             echo $cmd
-            # $cmd
+            $cmd
         done
     done
 
@@ -55,7 +55,7 @@ run_bench () {
         cmd="${subcmd} ${subcmd2}"
         echo `date '+%y/%m/%d %H:%M:%S'`
         echo $cmd
-        # $cmd
+        $cmd
     done
 }
 
@@ -68,6 +68,8 @@ run_opt () {
     exec_cmds["smac"]="python -m src.smac"
     exec_cmds["random"]="python -m src.random"
     exec_cmds["tpe"]="python -m src.tpe"
+    exec_cmds["hebo"]="python -m src.hebo"
+    exec_cmds["hyperband"]="python -m src.hyperband"
     exec_cmds["neps"]="./src/neps.sh"
 
     exec_cmd=${exec_cmds[$opt_name]}
@@ -80,11 +82,14 @@ run_opt () {
 
 if [[ "$mode" == "smac" ]]
 then
+    run_opt "hyperband"
     run_opt "smac"
+elif [[ "$mode" == "hebo" ]]
+then
+    run_opt "hebo"
 else
     for opt_name in "bohb" "dehb" "neps" "random" "tpe"
     do
         run_opt ${opt_name}
     done
 fi
-

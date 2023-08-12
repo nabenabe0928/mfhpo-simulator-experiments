@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import os
 from argparse import ArgumentParser
 from dataclasses import dataclass
-from typing import Any
+from pathlib import Path
+from typing import Any, Literal
 
 from benchmark_apis import HPOLib, JAHSBench201, LCBench, MFBranin, MFHartmann
 
@@ -12,6 +14,14 @@ import ConfigSpace as CS
 
 try:
     import optuna
+except ModuleNotFoundError:
+    pass
+
+try:
+    from smac import HyperbandFacade as HBFacade
+    from smac import MultiFidelityFacade as MFFacade
+    from smac import Scenario
+    from smac.intensifier.hyperband import Hyperband
 except ModuleNotFoundError:
     pass
 
@@ -67,6 +77,72 @@ def run_optuna(
     wrapper.set_config_space(config_space=config_space)
     study = optuna.create_study(sampler=sampler)
     study.optimize(wrapper, n_trials=n_actual_evals_in_opt, n_jobs=n_workers)
+
+
+class SMACObjectiveFuncWrapper(ObjectiveFuncWrapper):
+    def __call__(
+        self,
+        config: CS.Configuration,
+        budget: int,
+        seed: int | None = None,
+        data_to_scatter: dict[str, Any] | None = None,
+    ) -> float:
+        data_to_scatter = {} if data_to_scatter is None else data_to_scatter
+        eval_config = dict(config)
+        output = super().__call__(eval_config, fidels={self.fidel_keys[0]: int(budget)}, **data_to_scatter)
+        return output[self.obj_keys[0]]
+
+
+def run_smac(
+    obj_func: Any,
+    config_space: CS.ConfigurationSpace,
+    save_dir_name: str,
+    min_fidel: int,
+    max_fidel: int,
+    fidel_key: list[str],
+    seed: int,
+    n_workers: int,
+    sampler: Literal["smac", "hyperband"],
+    tmp_dir: str | None,
+    n_init_min: int = 5,
+    n_evals: int = 450,  # eta=3,S=2,100 full evals
+) -> None:
+    n_actual_evals_in_opt = n_evals + n_workers
+    scenario = Scenario(
+        config_space,
+        n_trials=n_actual_evals_in_opt,
+        min_budget=min_fidel,
+        max_budget=max_fidel,
+        n_workers=n_workers,
+        output_directory=Path(os.path.join("" if tmp_dir is None else tmp_dir, "smac3")),
+    )
+    wrapper = SMACObjectiveFuncWrapper(
+        obj_func=obj_func,
+        n_workers=n_workers,
+        save_dir_name=save_dir_name,
+        n_actual_evals_in_opt=n_actual_evals_in_opt,
+        n_evals=n_evals,
+        seed=seed,
+        fidel_keys=[fidel_key],
+        continual_max_fidel=max_fidel,
+        tmp_dir=tmp_dir,
+    )
+
+    facade = HBFacade if sampler == "hyperband" else MFFacade
+    smac = facade(
+        scenario,
+        wrapper.__call__,  # SMAC raises an error when using wrapper, so we use wrapper.__call__ instead.
+        initial_design=MFFacade.get_initial_design(scenario, n_configs=max(n_init_min, n_workers)),
+        intensifier=Hyperband(scenario, incumbent_selection="highest_budget"),
+        overwrite=True,
+    )
+    data_to_scatter = None
+    if hasattr(obj_func, "get_benchdata"):
+        # This data is shared in memory, and thus the optimization becomes quicker!
+        data_to_scatter = {"benchdata": obj_func.get_benchdata()}
+
+    # data_to_scatter must be a keyword argument.
+    smac.optimize(data_to_scatter=data_to_scatter)
 
 
 @dataclass(frozen=True)

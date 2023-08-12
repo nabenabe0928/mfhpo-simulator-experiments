@@ -13,7 +13,6 @@ n_workers=${N_WORKERS}
 cd $HOME/master-thesis-experiment
 
 subcmd="./run.sh --seed_start ${seed_start} --seed_end ${seed_end} --n_workers ${n_workers} --tmp_dir ${TMPDIR}"
-cmd="singularity exec mfhpo-simulator.sif ${subcmd}"
-cmd="singularity exec mfhpo-simulator-for-smac.sif ${subcmd} --mode smac"
+cmd="singularity exec mfhpo-simulator-for-smac.sif ${subcmd} --mode hebo"
 
 rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/

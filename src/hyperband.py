@@ -10,7 +10,7 @@ if __name__ == "__main__":
     save_dir_name = get_save_dir_name(args)
     bench = get_bench_instance(args, keep_benchdata=False)
     fidel_key = "epoch" if "epoch" in bench.fidel_keys else "z0"
-    sampler = "smac"
+    sampler = "hyperband"
     run_smac(
         obj_func=bench,
         config_space=bench.config_space,
