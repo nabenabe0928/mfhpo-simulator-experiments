@@ -12,8 +12,6 @@ n_workers=${N_WORKERS}
 
 echo "### Running preparation ###"
 echo "From seed ${seed_start} to seed ${seed_end} with n_workers=${n_workers}"
-echo "# of threads: ${OMP_NUM_THREADS}"
-echo "# of processors: ${MOAB_PROCCOUNT}"
 
 cd $HOME/master-thesis-experiment
 
