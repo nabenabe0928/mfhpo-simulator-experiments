@@ -67,6 +67,7 @@ def run_neps(
         fidel_keys=[fidel_key],
         continual_max_fidel=max_fidel,
         seed=seed,
+        max_waiting_time=30.0,
         tmp_dir=tmp_dir,
         worker_index=worker_index,
     )

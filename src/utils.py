@@ -73,6 +73,7 @@ def run_optuna(
         save_dir_name=save_dir_name,
         n_actual_evals_in_opt=n_actual_evals_in_opt,
         n_evals=n_evals,
+        max_waiting_time=5.0,
         seed=seed,
         tmp_dir=tmp_dir,
     )
@@ -125,6 +126,7 @@ def run_smac(
         n_actual_evals_in_opt=n_actual_evals_in_opt,
         n_evals=n_evals,
         seed=seed,
+        max_waiting_time=5.0,
         fidel_keys=[fidel_key],
         continual_max_fidel=max_fidel,
         tmp_dir=tmp_dir,

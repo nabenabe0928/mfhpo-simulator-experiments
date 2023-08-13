@@ -62,7 +62,7 @@ def get_bohb_workers(
         tmp_dir=tmp_dir,
     )
     bohb_workers = []
-    for i, w in enumerate(get_multiple_wrappers(**kwargs)):
+    for i, w in enumerate(get_multiple_wrappers(**kwargs, max_waiting_time=5.0)):
         worker = BOHBWorker(worker=w, id=i, nameserver=ns_host, run_id=run_id)
         worker.run(background=True)
         bohb_workers.append(worker)
