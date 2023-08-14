@@ -77,7 +77,7 @@ def run_neps(
     neps.run(
         run_pipeline=worker,
         pipeline_space=pipeline_space,
-        root_directory=os.path.join("" if tmp_dir is None else tmp_dir, "_".join(save_dir_name.split("/"))),
+        root_directory=os.path.join("" if tmp_dir is None else tmp_dir, "logs", "_".join(save_dir_name.split("/"))),
         max_evaluations_total=n_actual_evals_in_opt,
     )
 

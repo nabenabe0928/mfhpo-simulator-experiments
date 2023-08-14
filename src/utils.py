@@ -117,7 +117,7 @@ def run_smac(
         min_budget=min_fidel,
         max_budget=max_fidel,
         n_workers=n_workers,
-        output_directory=Path(os.path.join("" if tmp_dir is None else tmp_dir, "smac3")),
+        output_directory=Path(os.path.join("" if tmp_dir is None else tmp_dir, "logs/smac3")),
     )
     wrapper = SMACObjectiveFuncWrapper(
         obj_func=obj_func,

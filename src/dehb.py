@@ -56,7 +56,7 @@ def run_dehb(
         min_budget=min_fidel,
         max_budget=max_fidel,
         n_workers=n_workers,
-        output_path=os.path.join("" if tmp_dir is None else tmp_dir, "dehb-log"),
+        output_path=os.path.join("" if tmp_dir is None else tmp_dir, "logs/dehb-log"),
     )
     data_to_scatter = {}
     if hasattr(obj_func, "get_benchdata"):
