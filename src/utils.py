@@ -77,7 +77,7 @@ def run_optuna(
     n_workers: int,
     sampler: optuna.samplers.BaseSampler,
     tmp_dir: str | None,
-    n_evals: int = 450,  # eta=3,S=2,100 full evals
+    n_evals: int = 200,
 ) -> None:
     n_actual_evals_in_opt = n_evals + n_workers
     wrapper = OptunaObjectiveFuncWrapper(

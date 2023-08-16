@@ -17,4 +17,5 @@ if __name__ == "__main__":
         seed=args.seed,
         sampler=optuna.samplers.RandomSampler(),
         tmp_dir=args.tmp_dir,
+        n_evals=2000,
     )

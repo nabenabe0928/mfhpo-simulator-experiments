@@ -35,11 +35,13 @@ submit_bench () {
     done
 }
 
-for seed in `seq 0 29`
+for s in 0 1 2
 do
     for n_workers in 1 2 4 8
     do
-        fixed_vars_to_use="-v SEED_START=${seed},SEED_END=${seed},N_WORKERS=${n_workers}"
+        seed_start=$(($s * 10))
+        seed_end=$(($seed_start + 9))
+        fixed_vars_to_use="-v SEED_START=${seed_start},SEED_END=${seed_end},N_WORKERS=${n_workers}"
         submit_bench "$fixed_vars_to_use"
     done
 done

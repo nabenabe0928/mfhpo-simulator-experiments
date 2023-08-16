@@ -64,7 +64,7 @@ def run_hebo(
     seed: int,
     n_workers: int,
     tmp_dir: str | None,
-    n_evals: int = 450,  # eta=3,S=2,100 full evals
+    n_evals: int = 200,  # eta=3,S=2,100 full evals
 ):
     n_actual_evals_in_opt = n_evals + n_workers
     wrapper = ObjectiveFuncWrapper(
@@ -75,6 +75,7 @@ def run_hebo(
         n_evals=n_evals,
         seed=seed,
         ask_and_tell=True,
+        expensive_sampler=True,
         tmp_dir=tmp_dir,
     )
     hebo_space = extract_space(config_space=config_space)

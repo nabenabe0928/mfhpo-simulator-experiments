@@ -30,4 +30,6 @@ if __name__ == "__main__":
         save_dir_name=save_dir_name,
         seed=args.seed,
         tmp_dir=args.tmp_dir,
+        n_evals=4500,
+        n_brackets=720,
     )
