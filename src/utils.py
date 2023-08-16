@@ -42,6 +42,16 @@ import ujson as json
 BENCH_CHOICES = dict(
     lc=LCBench, hpobench=HPOBench, hpolib=HPOLib, jahs=JAHSBench201, branin=MFBranin, hartmann=MFHartmann
 )
+N_EVALS_DICT = dict(
+    hyperband=4500,
+    random=2000,
+    hebo=200,
+    tpe=200,
+    bohb=450,
+    dehb=450,
+    smac=450,
+    neps=450,
+)
 
 
 class OptunaObjectiveFuncWrapper(ObjectiveFuncWrapper):
@@ -294,11 +304,12 @@ def parse_args() -> ParsedArgs:
     return ParsedArgs(**kwargs)
 
 
-def is_completed(save_dir_name: str, n_evals: int = 450) -> bool:
+def is_completed(save_dir_name: str, opt_name: str) -> bool:
     result_path = os.path.join("mfhpo-simulator-info", save_dir_name, "results.json")
     if not os.path.exists(result_path):
         return False
 
+    n_evals = N_EVALS_DICT[opt_name]
     with open(result_path, mode="r") as f:
         return len(json.load(f)["cumtime"]) >= n_evals
 
@@ -311,7 +322,8 @@ def remove_failed_files():
             continue
 
         save_dir_name = dir_path.split(prefix)[-1]
-        if is_completed(save_dir_name=save_dir_name):
+        opt_name = save_dir_name.split("/")[0]
+        if is_completed(save_dir_name=save_dir_name, opt_name=opt_name):
             continue
 
         print(f"Remove {save_dir_name}")
@@ -329,7 +341,7 @@ def get_save_dir_name(opt_name: str, args: ParsedArgs) -> str:
         bench_name = f"{args.bench_name}{args.dim}d"
 
     save_dir_name = f"{opt_name}/bench={bench_name}{dataset_part}_nworkers={args.n_workers}/{args.seed}"
-    if is_completed(save_dir_name):
+    if is_completed(save_dir_name, opt_name=opt_name):
         sys.exit("The completed result already exists")
 
     return save_dir_name
