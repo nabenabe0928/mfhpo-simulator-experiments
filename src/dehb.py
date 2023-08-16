@@ -70,7 +70,7 @@ def run_dehb(
 
 if __name__ == "__main__":
     args = parse_args()
-    save_dir_name = get_save_dir_name(args)
+    save_dir_name = get_save_dir_name(opt_name="dehb", args=args)
     load_every_call = bool(args.n_workers != 1)
     bench = get_bench_instance(args, keep_benchdata=False, load_every_call=load_every_call)
     fidel_key = "epoch" if "epoch" in bench.fidel_keys else "z0"
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         fidel_key=fidel_key,
         n_workers=args.n_workers,
         load_every_call=load_every_call,
-        save_dir_name=os.path.join("dehb", save_dir_name),
+        save_dir_name=save_dir_name,
         seed=args.seed,
         tmp_dir=args.tmp_dir,
     )

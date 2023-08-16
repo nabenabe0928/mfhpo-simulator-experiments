@@ -1,5 +1,10 @@
 #!/bin/bash -l
 
+cmd="singularity exec mfhpo-simulator.sif python -m src.remove_files"
+echo "Remove failed files"
+echo $cmd
+$cmd
+
 for seed in `seq 0 29`
 do
     for n_workers in 1 2 4 8

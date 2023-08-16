@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import time
 from typing import Any
 
@@ -85,13 +84,13 @@ def run_hebo(
 
 if __name__ == "__main__":
     args = parse_args()
-    save_dir_name = get_save_dir_name(args)
+    save_dir_name = get_save_dir_name(opt_name="hebo", args=args)
     bench = get_bench_instance(args, use_fidel=False)
     run_hebo(
         obj_func=bench,
         config_space=bench.config_space,
         n_workers=args.n_workers,
-        save_dir_name=os.path.join("hebo", save_dir_name),
+        save_dir_name=save_dir_name,
         seed=args.seed,
         tmp_dir=args.tmp_dir,
     )

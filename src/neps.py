@@ -84,7 +84,7 @@ def run_neps(
 
 if __name__ == "__main__":
     args = parse_args()
-    save_dir_name = get_save_dir_name(args)
+    save_dir_name = get_save_dir_name(opt_name="neps", args=args)
     bench = get_bench_instance(args)
     fidel_key = "epoch" if "epoch" in bench.fidel_keys else "z0"
 
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         max_fidel=bench.max_fidels[fidel_key],
         fidel_key=fidel_key,
         n_workers=args.n_workers,
-        save_dir_name=os.path.join("neps", save_dir_name),
+        save_dir_name=save_dir_name,
         seed=args.seed,
         tmp_dir=args.tmp_dir,
         worker_index=args.worker_index,

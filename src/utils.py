@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import shutil
+import sys
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from pathlib import Path
@@ -33,6 +35,8 @@ try:
     from smac.intensifier.hyperband import Hyperband
 except ModuleNotFoundError:
     pass
+
+import ujson as json
 
 
 BENCH_CHOICES = dict(
@@ -290,7 +294,31 @@ def parse_args() -> ParsedArgs:
     return ParsedArgs(**kwargs)
 
 
-def get_save_dir_name(args: ParsedArgs) -> str:
+def is_completed(save_dir_name: str, n_evals: int = 450) -> bool:
+    result_path = os.path.join("mfhpo-simulator-info", save_dir_name, "results.json")
+    if not os.path.exists(result_path):
+        return False
+
+    with open(result_path, mode="r") as f:
+        return len(json.load(f)["cumtime"]) >= n_evals
+
+
+def remove_failed_files():
+    prefix = "mfhpo-simulator-info/"
+    for loc in os.walk(prefix):
+        dir_path, dir_names, file_names = loc
+        if "results.json" not in file_names:
+            continue
+
+        save_dir_name = dir_path.split(prefix)[-1]
+        if is_completed(save_dir_name=save_dir_name):
+            continue
+
+        print(f"Remove {save_dir_name}")
+        shutil.rmtree(dir_path)
+
+
+def get_save_dir_name(opt_name: str, args: ParsedArgs) -> str:
     dataset_part = ""
     if BENCH_CHOICES[args.bench_name]._BENCH_TYPE == "HPO":
         dataset_name = "-".join(BENCH_CHOICES[args.bench_name]._CONSTS.dataset_names[args.dataset_id].split("_"))
@@ -300,7 +328,11 @@ def get_save_dir_name(args: ParsedArgs) -> str:
     if args.bench_name == "hartmann":
         bench_name = f"{args.bench_name}{args.dim}d"
 
-    return f"bench={bench_name}{dataset_part}_nworkers={args.n_workers}/{args.seed}"
+    save_dir_name = f"{opt_name}/bench={bench_name}{dataset_part}_nworkers={args.n_workers}/{args.seed}"
+    if is_completed(save_dir_name):
+        sys.exit("The completed result already exists")
+
+    return save_dir_name
 
 
 def get_bench_instance(
