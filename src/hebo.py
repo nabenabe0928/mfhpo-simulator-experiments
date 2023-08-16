@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import time
 from typing import Any
 
 import ConfigSpace as CS
@@ -41,9 +42,13 @@ class HEBOOptimizer(AbstractAskTellOptimizer):
     def __init__(self, hebo_space, obj_key: str):
         self._hebo = HEBO(space=hebo_space)
         self._obj_key = obj_key
+        self._count_for_debug = 0
 
     def ask(self) -> tuple[dict[str, Any], None, None]:
-        print("ask")
+        self._count_for_debug += 1
+        if self._count_for_debug % 20 == 0:
+            print(f"Sample {self._count_for_debug}-th config at {time.time()}")
+
         config: pd.DataFrame = self._hebo.suggest()
         eval_config = {name: next(iter(v.values())) for name, v in config.to_dict().items()}
         return eval_config, None, None
