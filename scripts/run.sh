@@ -68,7 +68,6 @@ run_opt () {
     exec_cmds["smac"]="python -m src.smac"
     exec_cmds["random"]="python -m src.random"
     exec_cmds["tpe"]="python -m src.tpe"
-    exec_cmds["hebo"]="python -m src.hebo"
     exec_cmds["hyperband"]="python -m src.hyperband"
     exec_cmds["neps"]="./src/neps.sh"
 
@@ -83,9 +82,6 @@ run_opt () {
 if [[ "$mode" == "smac" ]]
 then
     run_opt "smac"
-elif [[ "$mode" == "hebo" ]]
-then
-    run_opt "hebo"
 else
     for opt_name in "bohb" "hyperband" "random" "tpe" "dehb" "neps"
     do

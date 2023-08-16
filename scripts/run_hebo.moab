@@ -9,16 +9,25 @@ module load tools/singularity/3.11
 seed_start=${SEED_START}
 seed_end=${SEED_END}
 n_workers=${N_WORKERS}
+bench_name=${BENCH_NAME}
+dataset_id=${DATASET_ID}
+dim=${DIM}
 
 echo "### Running preparation ###"
-echo "From seed ${seed_start} to seed ${seed_end} with n_workers=${n_workers}"
 
 cd $HOME/master-thesis-experiment
 
-subcmd="./scripts/run.sh --seed_start ${seed_start} --seed_end ${seed_end} --n_workers ${n_workers} --tmp_dir ${TMPDIR}"
-cmd="singularity exec mfhpo-simulator.sif ${subcmd} --mode hebo"
+if [[ "$bench_name" == "hartmann" ]]
+then
+    suffix="--dim ${dim}"
+elif [[ "$bench_name" == "branin" ]]
+then
+    suffix=""
+else
+    suffix="--dataset_id ${dataset_id}"
+fi
+
+subcmd="./scripts/run_hebo.sh --seed_start ${seed_start} --seed_end ${seed_end} --n_workers ${n_workers} --bench_name ${bench_name} ${suffix}"
+cmd="singularity exec mfhpo-simulator.sif ${subcmd}"
 echo $cmd
 $cmd
-
-echo "Start the result synchronization"
-rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/

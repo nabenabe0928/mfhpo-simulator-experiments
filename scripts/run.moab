@@ -16,7 +16,7 @@ echo "From seed ${seed_start} to seed ${seed_end} with n_workers=${n_workers}"
 
 cd $HOME/master-thesis-experiment
 
-subcmd="./scripts/run.sh --seed_start ${seed_start} --seed_end ${seed_end} --n_workers ${n_workers} --tmp_dir ${TMPDIR}"
+subcmd="./scripts/run.sh --seed_start ${seed_start} --seed_end ${seed_end} --n_workers ${n_workers}"
 cmd="singularity exec mfhpo-simulator.sif ${subcmd}"
 echo $cmd
 $cmd

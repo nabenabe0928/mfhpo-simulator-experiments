@@ -1,5 +1,6 @@
 #!/bin/bash -l
 
+module load tools/singularity/3.11
 cmd="singularity exec mfhpo-simulator.sif python -m src.remove_files"
 echo "Remove failed files"
 echo $cmd
@@ -13,9 +14,6 @@ do
         resource="-l nodes=1:ppn=${n_workers}"
 
         cmd="msub ${vars_to_use} ${resource} scripts/run.moab"
-        echo $cmd
-        $cmd
-        cmd="msub ${vars_to_use} scripts/run_hebo.moab"
         echo $cmd
         $cmd
     done
