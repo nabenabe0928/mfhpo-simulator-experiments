@@ -82,13 +82,12 @@ run_opt () {
 
 if [[ "$mode" == "smac" ]]
 then
-    run_opt "hyperband"
     run_opt "smac"
 elif [[ "$mode" == "hebo" ]]
 then
     run_opt "hebo"
 else
-    for opt_name in "bohb" "dehb" "neps" "random" "tpe"
+    for opt_name in "bohb" "hyperband" "random" "tpe" "dehb" "neps"
     do
         run_opt ${opt_name}
     done

@@ -8,7 +8,8 @@ from src.utils import get_bench_instance, get_save_dir_name, parse_args, run_sma
 if __name__ == "__main__":
     args = parse_args()
     save_dir_name = get_save_dir_name(args)
-    bench = get_bench_instance(args, keep_benchdata=False)
+    load_every_call = bool(args.n_workers != 1)
+    bench = get_bench_instance(args, keep_benchdata=False, load_every_call=load_every_call)
     fidel_key = "epoch" if "epoch" in bench.fidel_keys else "z0"
     sampler = "smac"
     run_smac(
@@ -20,6 +21,7 @@ if __name__ == "__main__":
         n_workers=args.n_workers,
         save_dir_name=os.path.join(sampler, save_dir_name),
         sampler=sampler,
+        load_every_call=load_every_call,
         seed=args.seed,
         tmp_dir=args.tmp_dir,
     )

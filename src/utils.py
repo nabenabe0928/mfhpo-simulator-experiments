@@ -8,9 +8,17 @@ from typing import Any, Literal
 
 from benchmark_apis import HPOBench, HPOLib, JAHSBench201, LCBench, MFBranin, MFHartmann
 
-from benchmark_simulator import ObjectiveFuncWrapper
+from benchmark_simulator import ObjectiveFuncWrapper, get_multiple_wrappers
 
 import ConfigSpace as CS
+
+try:
+    from hpbandster.core import nameserver as hpns
+    from hpbandster.core.worker import Worker
+    from hpbandster.optimizers import BOHB, HyperBand
+except ModuleNotFoundError:
+    class Worker:
+        NotImplemented
 
 try:
     import optuna
@@ -21,6 +29,7 @@ try:
     from smac import HyperbandFacade as HBFacade
     from smac import MultiFidelityFacade as MFFacade
     from smac import Scenario
+    from smac.main.config_selector import ConfigSelector
     from smac.intensifier.hyperband import Hyperband
 except ModuleNotFoundError:
     pass
@@ -73,7 +82,7 @@ def run_optuna(
         save_dir_name=save_dir_name,
         n_actual_evals_in_opt=n_actual_evals_in_opt,
         n_evals=n_evals,
-        max_waiting_time=5.0,
+        max_waiting_time=120.0,
         seed=seed,
         tmp_dir=tmp_dir,
     )
@@ -106,10 +115,16 @@ def run_smac(
     seed: int,
     n_workers: int,
     sampler: Literal["smac", "hyperband"],
+    load_every_call: bool,
     tmp_dir: str | None,
     n_init_min: int = 5,
     n_evals: int = 450,  # eta=3,S=2,100 full evals
 ) -> None:
+    data_to_scatter = None
+    if not load_every_call and hasattr(obj_func, "get_benchdata"):
+        # This data is shared in memory, and thus the optimization becomes quicker!
+        data_to_scatter = {"benchdata": obj_func.get_benchdata()}
+
     n_actual_evals_in_opt = n_evals + n_workers
     scenario = Scenario(
         config_space,
@@ -126,27 +141,127 @@ def run_smac(
         n_actual_evals_in_opt=n_actual_evals_in_opt,
         n_evals=n_evals,
         seed=seed,
-        max_waiting_time=5.0,
+        max_waiting_time=120.0,
         fidel_keys=[fidel_key],
         continual_max_fidel=max_fidel,
         tmp_dir=tmp_dir,
     )
 
-    facade = HBFacade if sampler == "hyperband" else MFFacade
-    smac = facade(
+    Facade = HBFacade if sampler == "hyperband" else MFFacade
+
+    class _WrappedFacade(Facade):
+        @staticmethod
+        def get_config_selector(
+            scenario: Scenario,
+            *,
+            retrain_after: int = 8,
+            retries: int = 1000,  # To prevent the early stopping in SMAC
+        ) -> ConfigSelector:
+            return ConfigSelector(scenario, retrain_after=retrain_after, retries=retries)
+
+    smac = _WrappedFacade(
         scenario,
         wrapper.__call__,  # SMAC raises an error when using wrapper, so we use wrapper.__call__ instead.
         initial_design=MFFacade.get_initial_design(scenario, n_configs=max(n_init_min, n_workers)),
         intensifier=Hyperband(scenario, incumbent_selection="highest_budget"),
         overwrite=True,
     )
-    data_to_scatter = None
-    if hasattr(obj_func, "get_benchdata"):
-        # This data is shared in memory, and thus the optimization becomes quicker!
-        data_to_scatter = {"benchdata": obj_func.get_benchdata()}
 
     # data_to_scatter must be a keyword argument.
     smac.optimize(data_to_scatter=data_to_scatter)
+
+
+class BOHBWorker(Worker):
+    # https://github.com/automl/HpBandSter
+    def __init__(self, worker: ObjectiveFuncWrapper, sleep_interval: int = 0.5, **kwargs: Any):
+        super().__init__(**kwargs)
+        self.sleep_interval = sleep_interval
+        self._worker = worker
+
+    def compute(self, config: dict[str, Any], budget: int, **kwargs: Any) -> dict[str, float]:
+        fidel_keys = self._worker.fidel_keys
+        fidels = dict(epoch=int(budget)) if "epoch" in fidel_keys else {k: int(budget) for k in fidel_keys}
+        # config_id: a triplet of ints(iteration, budget index, running index) internally used in BOHB
+        # By passing config_id, it increases the safety in the continual learning
+        config_id = kwargs["config_id"][0] + 100000 * kwargs["config_id"][2]
+        results = self._worker(eval_config=config, fidels=fidels, config_id=config_id)
+        return dict(loss=results["loss"])
+
+
+def get_bohb_workers(
+    run_id: str,
+    ns_host: str,
+    obj_func: Any,
+    save_dir_name: str,
+    max_fidel: int,
+    fidel_key: str,
+    n_workers: int,
+    n_actual_evals_in_opt: int,
+    n_evals: int,
+    seed: int,
+    tmp_dir: str | None,
+) -> list[BOHBWorker]:
+    kwargs = dict(
+        obj_func=obj_func,
+        n_workers=n_workers,
+        save_dir_name=save_dir_name,
+        continual_max_fidel=max_fidel,
+        fidel_keys=[fidel_key],
+        n_actual_evals_in_opt=n_actual_evals_in_opt,
+        n_evals=n_evals,
+        seed=seed,
+        tmp_dir=tmp_dir,
+    )
+    bohb_workers = []
+    for i, w in enumerate(get_multiple_wrappers(**kwargs, max_waiting_time=120.0)):
+        worker = BOHBWorker(worker=w, id=i, nameserver=ns_host, run_id=run_id)
+        worker.run(background=True)
+        bohb_workers.append(worker)
+
+    return bohb_workers
+
+
+def run_bohb(
+    obj_func: Any,
+    config_space: CS.ConfigurationSpace,
+    save_dir_name: str,
+    min_fidel: int,
+    max_fidel: int,
+    fidel_key: str,
+    seed: int,
+    n_workers: int,
+    tmp_dir: str | None,
+    sampler: Literal["hyperband", "bohb"],
+    run_id: str = "bohb-run",
+    ns_host: str = "127.0.0.1",
+    n_evals: int = 450,  # eta=3,S=2,100 full evals
+    n_brackets: int = 72,  # 22 HB iter --> 33 SH brackets
+) -> None:
+    ns = hpns.NameServer(run_id=run_id, host=ns_host, port=None)
+    ns.start()
+    _ = get_bohb_workers(
+        run_id=run_id,
+        ns_host=ns_host,
+        obj_func=obj_func,
+        save_dir_name=save_dir_name,
+        max_fidel=max_fidel,
+        fidel_key=fidel_key,
+        n_workers=n_workers,
+        n_actual_evals_in_opt=n_evals + n_workers,
+        n_evals=n_evals,
+        seed=seed,
+        tmp_dir=tmp_dir,
+    )
+    sampler_cls = HyperBand if sampler == "hyperband" else BOHB
+    opt = sampler_cls(
+        configspace=config_space,
+        run_id=run_id,
+        min_budget=min_fidel,
+        max_budget=max_fidel,
+    )
+    opt.run(n_iterations=n_brackets, min_n_workers=n_workers)
+    opt.shutdown(shutdown_workers=True)
+    ns.shutdown()
 
 
 @dataclass(frozen=True)
@@ -188,10 +303,14 @@ def get_save_dir_name(args: ParsedArgs) -> str:
     return f"bench={bench_name}{dataset_part}_nworkers={args.n_workers}/{args.seed}"
 
 
-def get_bench_instance(args: ParsedArgs, keep_benchdata: bool = True, use_fidel: bool = True) -> Any:
+def get_bench_instance(
+    args: ParsedArgs, keep_benchdata: bool = True, use_fidel: bool = True, load_every_call: bool = False,
+) -> Any:
     bench_cls = BENCH_CHOICES[args.bench_name]
     if bench_cls._BENCH_TYPE == "HPO":
-        obj_func = bench_cls(dataset_id=args.dataset_id, seed=args.seed, keep_benchdata=keep_benchdata)
+        obj_func = bench_cls(
+            dataset_id=args.dataset_id, seed=args.seed, keep_benchdata=keep_benchdata, load_every_call=load_every_call
+        )
     else:
         kwargs = dict(dim=args.dim) if args.bench_name == "hartmann" else dict()
         obj_func = bench_cls(seed=args.seed, use_fidel=use_fidel, **kwargs)

@@ -1,6 +1,4 @@
 **/__pycache__/
 *.sif
 mfhpo-simulator-info/
-smac3_output/*
-neps*/
-dehb-log/
+logs/

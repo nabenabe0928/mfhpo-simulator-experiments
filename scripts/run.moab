@@ -8,6 +8,8 @@ module load tools/singularity/3.11
 seed_start=${SEED_START}
 seed_end=${SEED_END}
 n_workers=${N_WORKERS}
+export BENCHMARK_ROOT_PATH=$TMPDIR
+cp -r $HOME/hpo_benchmarks/ $TMPDIR/
 
 echo "### Running preparation ###"
 echo "From seed ${seed_start} to seed ${seed_end} with n_workers=${n_workers}"

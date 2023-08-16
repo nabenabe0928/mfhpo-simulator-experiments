@@ -32,9 +32,15 @@ def run_dehb(
     fidel_key: str,
     n_workers: int,
     seed: int,
+    load_every_call: bool,
     tmp_dir: str | None,
     n_evals: int = 450,  # eta=3,S=2,100 full evals
 ) -> None:
+    data_to_scatter = {}
+    if not load_every_call and hasattr(obj_func, "get_benchdata"):
+        # This data is shared in memory, and thus the optimization becomes quicker!
+        data_to_scatter = {"benchdata": obj_func.get_benchdata()}
+
     np.random.seed(seed)
     n_actual_evals_in_opt = n_evals + n_workers
     wrapper = DEHBObjectiveFuncWrapper(
@@ -45,7 +51,7 @@ def run_dehb(
         n_evals=n_evals,
         continual_max_fidel=max_fidel,
         fidel_keys=[fidel_key],
-        max_waiting_time=5.0,
+        max_waiting_time=120.0,
         seed=seed,
         tmp_dir=tmp_dir,
     )
@@ -58,10 +64,6 @@ def run_dehb(
         n_workers=n_workers,
         output_path=os.path.join("" if tmp_dir is None else tmp_dir, "logs/dehb-log"),
     )
-    data_to_scatter = {}
-    if hasattr(obj_func, "get_benchdata"):
-        # This data is shared in memory, and thus the optimization becomes quicker!
-        data_to_scatter = {"benchdata": obj_func.get_benchdata()}
 
     dehb.run(fevals=n_actual_evals_in_opt, **data_to_scatter)
 
@@ -69,7 +71,8 @@ def run_dehb(
 if __name__ == "__main__":
     args = parse_args()
     save_dir_name = get_save_dir_name(args)
-    bench = get_bench_instance(args, keep_benchdata=False)
+    load_every_call = bool(args.n_workers != 1)
+    bench = get_bench_instance(args, keep_benchdata=False, load_every_call=load_every_call)
     fidel_key = "epoch" if "epoch" in bench.fidel_keys else "z0"
     run_dehb(
         obj_func=bench,
@@ -78,6 +81,7 @@ if __name__ == "__main__":
         max_fidel=bench.max_fidels[fidel_key],
         fidel_key=fidel_key,
         n_workers=args.n_workers,
+        load_every_call=load_every_call,
         save_dir_name=os.path.join("dehb", save_dir_name),
         seed=args.seed,
         tmp_dir=args.tmp_dir,
