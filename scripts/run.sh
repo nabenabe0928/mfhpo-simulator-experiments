@@ -77,6 +77,9 @@ run_opt () {
         subcmd="${exec_cmd} --seed ${seed} --n_workers ${n_workers} --tmp_dir ${TMPDIR}"
         run_bench "$subcmd"
     done
+
+    echo "Start the result synchronization for ${opt_name}"
+    rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/
 }
 
 if [[ "$mode" == "smac" ]]

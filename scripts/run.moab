@@ -23,6 +23,3 @@ $cmd
 cmd="singularity exec mfhpo-simulator-for-smac.sif ${subcmd} --mode smac"
 echo $cmd
 $cmd
-
-echo "Start the result synchronization"
-rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/
