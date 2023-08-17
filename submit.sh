@@ -13,8 +13,11 @@ do
         vars_to_use="-v SEED_START=${seed},SEED_END=${seed},N_WORKERS=${n_workers}"
         resource="-l nodes=1:ppn=${n_workers}"
 
-        cmd="msub ${vars_to_use} ${resource} scripts/run.moab"
-        echo $cmd
-        $cmd
+        for mode in hb oss neps
+        do
+            cmd="msub ${vars_to_use},MODE=${mode} ${resource} scripts/run.moab"
+            echo $cmd
+            $cmd
+        done
     done
 done

@@ -8,6 +8,7 @@ module load tools/singularity/3.11
 seed_start=${SEED_START}
 seed_end=${SEED_END}
 n_workers=${N_WORKERS}
+mode=${MODE}
 export BENCHMARK_ROOT_PATH=$TMPDIR
 cp -r $HOME/hpo_benchmarks/ $TMPDIR/
 
@@ -15,11 +16,19 @@ echo "### Running preparation ###"
 echo "From seed ${seed_start} to seed ${seed_end} with n_workers=${n_workers}"
 
 cd $HOME/master-thesis-experiment
-
 subcmd="./scripts/run.sh --seed_start ${seed_start} --seed_end ${seed_end} --n_workers ${n_workers}"
-cmd="singularity exec mfhpo-simulator.sif ${subcmd}"
-echo $cmd
-$cmd
-cmd="singularity exec mfhpo-simulator-for-smac.sif ${subcmd} --mode smac"
-echo $cmd
-$cmd
+
+if [[ "$mode" == "oss" ]]
+then
+    cmd="singularity exec mfhpo-simulator-for-smac.sif ${subcmd} --mode smac"
+    echo $cmd
+    $cmd
+
+    cmd="singularity exec mfhpo-simulator.sif ${subcmd} --mode optuna"
+    echo $cmd
+    $cmd
+else
+    cmd="singularity exec mfhpo-simulator.sif ${subcmd} --mode ${mode}"
+    echo $cmd
+    $cmd
+fi

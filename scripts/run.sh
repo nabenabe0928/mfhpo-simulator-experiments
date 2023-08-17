@@ -85,11 +85,17 @@ run_opt () {
 if [[ "$mode" == "smac" ]]
 then
     run_opt "smac"
+elif [[ "$mode" == "hb" ]]
+then
+    run_opt "bohb"
+    run_opt "dehb"
+    run_opt "hyperband"
+elif [[ "$mode" == "optuna" ]]
+then
+    run_opt "random"
+    run_opt "tpe"
 else
-    for opt_name in "bohb" "hyperband" "random" "tpe" "dehb" "neps"
-    do
-        run_opt ${opt_name}
-    done
+    run_opt "neps"
 fi
 
 echo `date '+%y/%m/%d %H:%M:%S'`
