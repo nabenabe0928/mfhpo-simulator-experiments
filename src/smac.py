@@ -7,7 +7,7 @@ if __name__ == "__main__":
     args = parse_args()
     sampler = "smac"
     save_dir_name = get_save_dir_name(opt_name=sampler, args=args)
-    load_every_call = bool(args.n_workers != 1)
+    load_every_call = True
     bench = get_bench_instance(args, keep_benchdata=False, load_every_call=load_every_call)
     fidel_key = "epoch" if "epoch" in bench.fidel_keys else "z0"
     run_smac(

@@ -16,19 +16,29 @@ echo "### Running preparation ###"
 echo "From seed ${seed_start} to seed ${seed_end} with n_workers=${n_workers}"
 
 cd $HOME/master-thesis-experiment
-subcmd="./scripts/run.sh --seed_start ${seed_start} --seed_end ${seed_end} --n_workers ${n_workers}"
+subcmd="./scripts/run.sh --seed_start ${seed_start} --seed_end ${seed_end} --n_workers ${n_workers} --opt_name"
 
+sing="singularity exec mfhpo-simulator.sif"
+sing_smac="singularity exec mfhpo-simulator-for-smac.sif"
 if [[ "$mode" == "oss" ]]
 then
-    cmd="singularity exec mfhpo-simulator.sif ${subcmd} --mode optuna"
-    echo $cmd
-    $cmd
-
-    cmd="singularity exec mfhpo-simulator-for-smac.sif ${subcmd} --mode smac"
-    echo $cmd
-    $cmd
+    for cmd in "${sing} ${subcmd} random" "${sing} ${subcmd} tpe" "${sing_smac} ${subcmd} smac"
+    do
+        echo $cmd
+        $cmd
+        rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/
+    done
+elif [[ "$mode" == "hb" ]]
+then
+    for cmd in "${sing} ${subcmd} bohb" "${sing} ${subcmd} hyperband" "${sing_smac} ${subcmd} dehb"
+    do
+        echo $cmd
+        $cmd
+        rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/
+    done
 else
-    cmd="singularity exec mfhpo-simulator.sif ${subcmd} --mode ${mode}"
+    cmd="${sing} ${subcmd} neps"
     echo $cmd
     $cmd
+    rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/
 fi

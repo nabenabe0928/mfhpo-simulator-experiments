@@ -4,8 +4,8 @@ while [[ $# -gt 0 ]]; do
     key="$1"
 
     case $key in
-        --mode)
-            mode="$2"
+        --opt_name)
+            opt_name="$2"
             shift
             shift
             ;;
@@ -79,24 +79,8 @@ run_opt () {
     done
 
     echo "Start the result synchronization for ${opt_name}"
-    rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/
 }
 
-if [[ "$mode" == "smac" ]]
-then
-    run_opt "smac"
-elif [[ "$mode" == "hb" ]]
-then
-    run_opt "bohb"
-    run_opt "hyperband"
-    run_opt "dehb"
-elif [[ "$mode" == "optuna" ]]
-then
-    run_opt "random"
-    run_opt "tpe"
-else
-    run_opt "neps"
-fi
-
+run_opt $opt_name
 echo `date '+%y/%m/%d %H:%M:%S'`
-echo "Finished run.sh with mode=${mode}!!"
+echo "Finished run.sh with opt_name=${opt_name}!!"

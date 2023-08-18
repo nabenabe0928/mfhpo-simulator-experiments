@@ -135,9 +135,9 @@ def run_smac(
     n_evals: int = 450,  # eta=3,S=2,100 full evals
 ) -> None:
     data_to_scatter = None
-    if not load_every_call and hasattr(obj_func, "get_benchdata"):
-        # This data is shared in memory, and thus the optimization becomes quicker!
-        data_to_scatter = {"benchdata": obj_func.get_benchdata()}
+    # if not load_every_call and hasattr(obj_func, "get_benchdata"):
+    #     # This data is shared in memory, and thus the optimization becomes quicker!
+    #     data_to_scatter = {"benchdata": obj_func.get_benchdata()}
 
     n_actual_evals_in_opt = n_evals + n_workers
     scenario = Scenario(
@@ -312,7 +312,7 @@ def is_completed(save_dir_name: str, opt_name: str) -> bool:
     n_evals = N_EVALS_DICT[opt_name]
     with open(result_path, mode="r") as f:
         results = json.load(f)
-        return len(results) == 0 or len(results["cumtime"]) >= n_evals
+        return len(results) != 0 and len(results["cumtime"]) >= n_evals
 
 
 def remove_failed_files():
