@@ -88,8 +88,8 @@ then
 elif [[ "$mode" == "hb" ]]
 then
     run_opt "bohb"
-    run_opt "dehb"
     run_opt "hyperband"
+    run_opt "dehb"
 elif [[ "$mode" == "optuna" ]]
 then
     run_opt "random"

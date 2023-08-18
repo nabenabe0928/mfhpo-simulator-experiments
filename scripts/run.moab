@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#MSUB -l walltime=96:00:00
+#MSUB -l walltime=24:00:00
 #MSUB -l pmem=15gb
 #MSUB -l naccesspolicy=singlejob
 
