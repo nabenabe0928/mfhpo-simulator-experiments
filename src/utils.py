@@ -311,7 +311,8 @@ def is_completed(save_dir_name: str, opt_name: str) -> bool:
 
     n_evals = N_EVALS_DICT[opt_name]
     with open(result_path, mode="r") as f:
-        return len(json.load(f)["cumtime"]) >= n_evals
+        results = json.load(f)
+        return len(results) == 0 or len(results["cumtime"]) >= n_evals
 
 
 def remove_failed_files():
