@@ -59,4 +59,4 @@ do
     $cmd
 done
 
-echo "Finished run.sh with mode=${mode}!!"
+echo "Finished run.sh for HEBO!!"
