@@ -28,7 +28,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --dim)
-            n_workers="$2"
+            dim="$2"
             shift
             shift
             ;;
