@@ -331,6 +331,25 @@ def remove_failed_files():
         shutil.rmtree(dir_path)
 
 
+def cleanup_info():
+    prefix = "mfhpo-simulator-info/"
+    count = 0
+    for loc in os.walk(prefix):
+        dir_path, dir_names, file_names = loc
+        if "results.json" not in file_names:
+            continue
+
+        count += 1
+        if count % 1000 == 0:
+            print(f"Checked {count} directories")
+
+        for fn in file_names:
+            if fn.endswith("results.json") or fn.endswith("sampled_time.json"):
+                continue
+
+            os.remove(os.path.join(dir_path, fn))
+
+
 def get_save_dir_name(opt_name: str, args: ParsedArgs) -> str:
     dataset_part = ""
     if BENCH_CHOICES[args.bench_name]._BENCH_TYPE == "HPO":

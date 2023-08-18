@@ -20,11 +20,11 @@ subcmd="./scripts/run.sh --seed_start ${seed_start} --seed_end ${seed_end} --n_w
 
 if [[ "$mode" == "oss" ]]
 then
-    cmd="singularity exec mfhpo-simulator-for-smac.sif ${subcmd} --mode smac"
+    cmd="singularity exec mfhpo-simulator.sif ${subcmd} --mode optuna"
     echo $cmd
     $cmd
 
-    cmd="singularity exec mfhpo-simulator.sif ${subcmd} --mode optuna"
+    cmd="singularity exec mfhpo-simulator-for-smac.sif ${subcmd} --mode smac"
     echo $cmd
     $cmd
 else
