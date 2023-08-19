@@ -40,7 +40,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-prefix="python -m src.hebo --bench_name ${bench_name} --n_workers ${n_workers} --tmp_dir ${TMPDIR}"
+prefix="python -m src.hebo --bench_name ${bench_name} --n_workers ${n_workers}"
 if [[ "$bench_name" == "hartmann" ]]
 then
     suffix="--dim ${dim}"
