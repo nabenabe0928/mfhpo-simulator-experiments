@@ -30,7 +30,7 @@ then
     done
 elif [[ "$mode" == "hb" ]]
 then
-    for cmd in "${sing} ${subcmd} bohb" "${sing} ${subcmd} hyperband" "${sing_smac} ${subcmd} dehb"
+    for cmd in "${sing} ${subcmd} bohb" "${sing} ${subcmd} hyperband" "${sing} ${subcmd} dehb"
     do
         echo $cmd
         $cmd
