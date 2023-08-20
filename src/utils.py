@@ -315,6 +315,29 @@ def is_completed(save_dir_name: str, opt_name: str) -> bool:
         return len(results) != 0 and len(results["cumtime"]) >= n_evals
 
 
+def compress_files():
+    prefix = "mfhpo-simulator-info/"
+    for loc in os.walk(prefix):
+        dir_path, dir_names, file_names = loc
+        if "results.json" not in file_names:
+            continue
+
+        save_dir_name = dir_path.split(prefix)[-1]
+        opt_name = save_dir_name.split("/")[0]
+        if not is_completed(save_dir_name=save_dir_name, opt_name=opt_name):
+            continue
+
+        print(f"Compress {save_dir_name}")
+        for target, keys in zip(["results", "sampled_time"], [["cumtime", "loss"], ["before_sample", "after_sample"]]):
+            json_fn = f"{target}.json"
+            with open(os.path.join(prefix, save_dir_name, json_fn), mode="r") as f:
+                data = json.load(f)
+                data[keys[0]] = [float(f"{d:.6e}") for d in data[keys[0]]]
+                data[keys[1]] = [float(f"{d:.6e}") for d in data[keys[1]]]
+            with open(os.path.join(prefix, save_dir_name, json_fn), mode="w") as f:
+                json.dump(data, f)
+
+
 def remove_failed_files():
     prefix = "mfhpo-simulator-info/"
     for loc in os.walk(prefix):
