@@ -379,7 +379,7 @@ def cleanup_info():
             print(f"Checked {count} directories")
 
         for fn in file_names:
-            if fn.endswith("results.json") or fn.endswith("sampled_time.json"):
+            if any(fn.endswith(pattern) for pattern in ["results.json", "compress.lock", "sampled_time.json"]):
                 continue
 
             os.remove(os.path.join(dir_path, fn))
