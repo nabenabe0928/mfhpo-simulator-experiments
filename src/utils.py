@@ -376,6 +376,7 @@ def remove_failed_files():
 def cleanup_info():
     prefix = "mfhpo-simulator-info/"
     count = 0
+    protected = ["results.json", "compress.lock", "complete.lock", "sampled_time.json"]
     for loc in os.walk(prefix):
         dir_path, dir_names, file_names = loc
         if "results.json" not in file_names:
@@ -386,7 +387,7 @@ def cleanup_info():
             print(f"Checked {count} directories")
 
         for fn in file_names:
-            if any(fn.endswith(pattern) for pattern in ["results.json", "compress.lock", "sampled_time.json"]):
+            if any(fn.endswith(pattern) for pattern in protected):
                 continue
 
             os.remove(os.path.join(dir_path, fn))
