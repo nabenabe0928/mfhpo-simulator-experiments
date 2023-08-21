@@ -349,10 +349,13 @@ def compress_files():
 
 def remove_failed_files():
     prefix = "mfhpo-simulator-info/"
-    for loc in os.walk(prefix):
+    for count, loc in enumerate(os.walk(prefix), start=1):
         dir_path, dir_names, file_names = loc
         if "results.json" not in file_names:
             continue
+
+        if count % 1000 == 0:
+            print(f"Checked {count} directories")
 
         save_dir_name = dir_path.split(prefix)[-1]
         opt_name = save_dir_name.split("/")[0]
