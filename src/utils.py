@@ -317,12 +317,21 @@ def is_completed(save_dir_name: str, opt_name: str) -> bool:
 
 def compress_files():
     prefix = "mfhpo-simulator-info/"
-    for loc in os.walk(prefix):
+    lock_fn = "compress.lock"
+    for count, loc in enumerate(os.walk(prefix), start=1):
         dir_path, dir_names, file_names = loc
         if "results.json" not in file_names:
             continue
 
+        if count % 1000 == 0:
+            print(f"Checked {count} directories")
+
+        if lock_fn in file_names:
+            continue
+
         save_dir_name = dir_path.split(prefix)[-1]
+        with open(os.path.join(prefix, save_dir_name, lock_fn), mode="w"):
+            pass
         opt_name = save_dir_name.split("/")[0]
         if not is_completed(save_dir_name=save_dir_name, opt_name=opt_name):
             continue
