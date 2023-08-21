@@ -349,6 +349,7 @@ def compress_files():
 
 def remove_failed_files():
     prefix = "mfhpo-simulator-info/"
+    lock_fn = "complete.lock"
     for count, loc in enumerate(os.walk(prefix), start=1):
         dir_path, dir_names, file_names = loc
         if "results.json" not in file_names:
@@ -357,9 +358,15 @@ def remove_failed_files():
         if count % 1000 == 0:
             print(f"Checked {count} directories")
 
+        if lock_fn in file_names:
+            continue
+
         save_dir_name = dir_path.split(prefix)[-1]
         opt_name = save_dir_name.split("/")[0]
         if is_completed(save_dir_name=save_dir_name, opt_name=opt_name):
+            with open(os.path.join(prefix, save_dir_name, lock_fn), mode="w"):
+                pass
+
             continue
 
         print(f"Remove {save_dir_name}")
