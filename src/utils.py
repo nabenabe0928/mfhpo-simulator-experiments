@@ -318,7 +318,7 @@ def is_completed(save_dir_name: str, opt_name: str) -> bool:
 def compress_files():
     prefix = "mfhpo-simulator-info/"
     lock_fn = "compress.lock"
-    complete_count = {}
+    complete_count = {opt_name: 0 for opt_name in N_EVALS_DICT}
     for count, loc in enumerate(os.walk(prefix), start=1):
         dir_path, dir_names, file_names = loc
         if "results.json" not in file_names:
@@ -354,7 +354,7 @@ def compress_files():
 def remove_failed_files():
     prefix = "mfhpo-simulator-info/"
     lock_fn = "complete.lock"
-    complete_count = {}
+    complete_count = {opt_name: 0 for opt_name in N_EVALS_DICT}
     for count, loc in enumerate(os.walk(prefix), start=1):
         dir_path, dir_names, file_names = loc
         if "results.json" not in file_names:
