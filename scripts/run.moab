@@ -53,9 +53,9 @@ do
     subcmd="./scripts/run.sh --seed_start ${seed} --seed_end ${seed} --n_workers ${n_workers} --opt_name ${opt_name}"
     if [[ "$opt_name" == "smac" ]]
     then
-        sing="singularity exec mfhpo-simulator.sif"
-    else
         sing="singularity exec mfhpo-simulator-for-smac.sif"
+    else
+        sing="singularity exec mfhpo-simulator.sif"
     fi
 
     run_bench "${sing} ${subcmd}"

@@ -22,7 +22,7 @@ submit_bench () {
             vars_to_use="${fixed_vars_to_use},BENCH_NAME=${bench_name},DATASET_ID=${dataset_id}"
             cmd="msub ${vars_to_use} scripts/run_hebo.moab"
             echo $cmd
-            # $cmd
+            $cmd
         done
     done
 
@@ -31,7 +31,7 @@ submit_bench () {
         vars_to_use="${fixed_vars_to_use},${other_vars_to_use}"
         cmd="msub ${vars_to_use} scripts/run_hebo.moab"
         echo $cmd
-        # $cmd
+        $cmd
     done
 }
 
