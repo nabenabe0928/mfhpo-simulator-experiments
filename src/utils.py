@@ -308,6 +308,8 @@ def is_completed(save_dir_name: str, opt_name: str) -> bool:
     result_path = os.path.join("mfhpo-simulator-info", save_dir_name, "results.json")
     if not os.path.exists(result_path):
         return False
+    if os.path.exists(os.path.join("mfhpo-simulator-info", save_dir_name, "complete.lock")):
+        return True
 
     n_evals = N_EVALS_DICT[opt_name]
     with open(result_path, mode="r") as f:
