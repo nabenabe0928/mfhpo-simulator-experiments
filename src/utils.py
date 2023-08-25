@@ -311,14 +311,18 @@ def is_completed(save_dir_name: str, opt_name: str) -> bool:
 
     lock_file = os.path.join("mfhpo-simulator-info", save_dir_name, "complete.lock")
     if os.path.exists(lock_file):
-        with open(lock_file, mode="w"):
-            pass
         return True
 
     n_evals = N_EVALS_DICT[opt_name]
     with open(result_path, mode="r") as f:
         results = json.load(f)
-        return len(results) != 0 and len(results["cumtime"]) >= n_evals
+
+    completed = len(results) != 0 and len(results["cumtime"]) >= n_evals
+    if completed:
+        with open(lock_file, mode="w"):
+            pass
+
+    return completed
 
 
 def compress_files():
