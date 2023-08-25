@@ -308,7 +308,11 @@ def is_completed(save_dir_name: str, opt_name: str) -> bool:
     result_path = os.path.join("mfhpo-simulator-info", save_dir_name, "results.json")
     if not os.path.exists(result_path):
         return False
-    if os.path.exists(os.path.join("mfhpo-simulator-info", save_dir_name, "complete.lock")):
+
+    lock_file = os.path.join("mfhpo-simulator-info", save_dir_name, "complete.lock")
+    if os.path.exists(lock_file):
+        with open(lock_file, mode="w"):
+            pass
         return True
 
     n_evals = N_EVALS_DICT[opt_name]
@@ -372,9 +376,6 @@ def remove_failed_files():
             continue
 
         if is_completed(save_dir_name=save_dir_name, opt_name=opt_name):
-            with open(os.path.join(prefix, save_dir_name, lock_fn), mode="w"):
-                pass
-
             continue
 
         print(f"Remove {save_dir_name}")
