@@ -51,7 +51,7 @@ def run_dehb(
         n_evals=n_evals,
         continual_max_fidel=max_fidel,
         fidel_keys=[fidel_key],
-        max_waiting_time=120.0,
+        max_waiting_time=180.0,
         seed=seed,
         tmp_dir=tmp_dir,
     )
