@@ -97,6 +97,7 @@ def run_optuna(
         n_actual_evals_in_opt=n_actual_evals_in_opt,
         n_evals=n_evals,
         max_waiting_time=120.0,
+        store_actual_cumtime=True,
         seed=seed,
         tmp_dir=tmp_dir,
     )
@@ -156,6 +157,7 @@ def run_smac(
         n_evals=n_evals,
         seed=seed,
         max_waiting_time=120.0,
+        store_actual_cumtime=True,
         fidel_keys=[fidel_key],
         continual_max_fidel=max_fidel,
         tmp_dir=tmp_dir,
@@ -224,6 +226,7 @@ def get_bohb_workers(
         n_actual_evals_in_opt=n_actual_evals_in_opt,
         n_evals=n_evals,
         seed=seed,
+        store_actual_cumtime=True,
         tmp_dir=tmp_dir,
     )
     bohb_workers = []

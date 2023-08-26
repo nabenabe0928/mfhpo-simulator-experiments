@@ -75,6 +75,7 @@ def run_hebo(
         n_evals=n_evals,
         seed=seed,
         ask_and_tell=True,
+        store_actual_cumtime=True,
         expensive_sampler=True,
         tmp_dir=tmp_dir,
     )
