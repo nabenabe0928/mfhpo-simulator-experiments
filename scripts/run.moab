@@ -1,5 +1,4 @@
 #!/bin/bash -l
-#MSUB -l pmem=15gb
 #MSUB -l naccesspolicy=singlejob
 
 module load tools/singularity/3.11

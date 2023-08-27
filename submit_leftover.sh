@@ -20,7 +20,8 @@ do
     vars_to_use="-v SEED_START=0,SEED_END=29,N_WORKERS=${n_workers}"
     for opt_name in random tpe hyperband bohb dehb neps smac
     do
-        resource="-l nodes=1:ppn=${n_workers},${rsrc[$opt_name]}"
+        memlimit=$(($n_workers * 15))
+        resource="-l nodes=1:ppn=${n_workers},${rsrc[$opt_name]},mem=${memlimit}gb"
         cmd="msub ${vars_to_use},OPT_NAME=${opt_name} ${resource} scripts/run.moab"
         echo $cmd
         $cmd
