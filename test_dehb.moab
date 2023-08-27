@@ -1,0 +1,11 @@
+#!/bin/bash -l
+#MSUB -l pmem=15gb
+#MSUB -l naccesspolicy=singlejob
+#MSUB -l nodes=1:ppn=8
+#MSUB -l walltime=0:05:00
+
+module load tools/singularity/3.11
+
+cd $HOME/master-thesis-experiment
+
+singularity exec mfhpo-simulator.sif python -c 'from distributed import Client; client = Client(n_workers=8, processes=True, threads_per_worker=1, scheduler_port=0); print({k: v["memory_limit"] / 2 ** 30 for k, v in client.scheduler_info()["workers"].items()})'

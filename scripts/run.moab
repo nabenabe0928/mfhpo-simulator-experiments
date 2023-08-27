@@ -23,6 +23,16 @@ run_bench (){
     bench_max_id["jahs"]=2
     bench_max_id["hpobench"]=7
 
+    for subcmd2 in "--bench_name hartmann --dim 3" "--bench_name hartmann --dim 6" "--bench_name branin"
+    do
+        cmd="${subcmd} ${subcmd2}"
+        echo `date '+%y/%m/%d %H:%M:%S'`
+        echo $cmd
+        $cmd
+        rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/
+        rm -r -f $TMPDIR/mfhpo-simulator-info/
+    done
+
     for bench_name in hpolib hpobench lc jahs
     do
         for dataset_id in `seq 0 ${bench_max_id[$bench_name]}`
@@ -34,16 +44,6 @@ run_bench (){
             rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/
             rm -r -f $TMPDIR/mfhpo-simulator-info/
         done
-    done
-
-    for subcmd2 in "--bench_name hartmann --dim 3" "--bench_name hartmann --dim 6" "--bench_name branin"
-    do
-        cmd="${subcmd} ${subcmd2}"
-        echo `date '+%y/%m/%d %H:%M:%S'`
-        echo $cmd
-        $cmd
-        rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/
-        rm -r -f $TMPDIR/mfhpo-simulator-info/
     done
 }
 

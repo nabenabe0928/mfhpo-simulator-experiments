@@ -8,7 +8,7 @@ $cmd
 
 declare -A rsrc
 rsrc["bohb"]="walltime=8:00:00"
-rsrc["dehb"]="walltime=8:00:00"
+rsrc["dehb"]="walltime=2:00:00"
 rsrc["smac"]="walltime=8:00:00"
 rsrc["random"]="walltime=24:00:00"
 rsrc["tpe"]="walltime=8:00:00"
