@@ -8,10 +8,14 @@ seed_end=${SEED_END}
 n_workers=${N_WORKERS}
 opt_name=${OPT_NAME}
 export BENCHMARK_ROOT_PATH=$TMPDIR
+export INIT_LOCAL_CONFIG=False
 cp -r $HOME/hpo_benchmarks/ $TMPDIR/
 
 echo "### Running preparation ###"
 echo "From seed ${seed_start} to seed ${seed_end} with n_workers=${n_workers}"
+
+echo "### Initialize the LCBench local config ###"
+singularity exec mfhpo-simulator.sif python -m src.lcbench_local_config
 
 run_bench (){
     subcmd=${1}
