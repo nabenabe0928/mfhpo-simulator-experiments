@@ -14,9 +14,6 @@ cp -r $HOME/hpo_benchmarks/ $TMPDIR/
 echo "### Running preparation ###"
 echo "From seed ${seed_start} to seed ${seed_end} with n_workers=${n_workers}"
 
-echo "### Initialize the LCBench local config ###"
-singularity exec mfhpo-simulator.sif python -m src.lcbench_local_config
-
 run_bench (){
     subcmd=${1}
 
@@ -51,6 +48,9 @@ run_bench (){
 }
 
 cd $HOME/master-thesis-experiment
+echo "### Initialize the LCBench local config ###"
+singularity exec mfhpo-simulator.sif python -m src.lcbench_local_config
+
 for seed in `seq ${seed_start} ${seed_end}`
 do
     subcmd="./scripts/run.sh --seed_start ${seed} --seed_end ${seed} --n_workers ${n_workers} --opt_name ${opt_name}"
