@@ -1,7 +1,7 @@
 mfhpo-simulator>=1.3.2
 
 # Benchmark (SMAC3 cannot handle YAHPO and JAHS due to the ConfigSpace version incompatibility)
-mfhpo-benchmark-api>=2.2.0
+mfhpo-benchmark-api>=2.2.2
 
 # SMAC3 <=== cannot use it with JAHS
 smac>=2.0.1
