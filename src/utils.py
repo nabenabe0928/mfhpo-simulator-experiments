@@ -434,7 +434,11 @@ def get_bench_instance(
     bench_cls = BENCH_CHOICES[args.bench_name]
     if bench_cls._BENCH_TYPE == "HPO":
         obj_func = bench_cls(
-            dataset_id=args.dataset_id, seed=args.seed, keep_benchdata=keep_benchdata, load_every_call=load_every_call
+            dataset_id=args.dataset_id,
+            seed=args.seed,
+            keep_benchdata=keep_benchdata,
+            load_every_call=load_every_call,
+            root_dir=args.tmp_dir,
         )
     else:
         kwargs = dict(dim=args.dim) if args.bench_name == "hartmann" else dict()

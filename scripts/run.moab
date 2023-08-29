@@ -7,7 +7,6 @@ seed_start=${SEED_START}
 seed_end=${SEED_END}
 n_workers=${N_WORKERS}
 opt_name=${OPT_NAME}
-export BENCHMARK_ROOT_PATH=$TMPDIR
 export INIT_LOCAL_CONFIG=False
 cp -r $HOME/hpo_benchmarks/ $TMPDIR/
 
@@ -49,7 +48,7 @@ run_bench (){
 
 cd $HOME/master-thesis-experiment
 echo "### Initialize the LCBench local config ###"
-singularity exec mfhpo-simulator.sif python -m src.lcbench_local_config
+singularity exec mfhpo-simulator.sif python -m src.lcbench_local_config --tmp_dir $TMPDIR
 
 for seed in `seq ${seed_start} ${seed_end}`
 do
