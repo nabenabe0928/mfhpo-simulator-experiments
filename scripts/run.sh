@@ -39,6 +39,11 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
+        --tmp_dir)
+            tmp_dir="$2"
+            shift
+            shift
+            ;;
         *)
             shift
             ;;
@@ -73,7 +78,7 @@ exec_cmds["hyperband"]="python -m src.hyperband"
 exec_cmds["neps"]="./src/neps.sh"
 
 exec_cmd=${exec_cmds[$opt_name]}
-fixed_cmd="${exec_cmd} --n_workers ${n_workers} --tmp_dir ${TMPDIR} --bench_name ${bench_name}"
+fixed_cmd="${exec_cmd} --n_workers ${n_workers} --tmp_dir ${tmp_dir} --bench_name ${bench_name}"
 for seed in `seq ${seed_start} ${seed_end}`
 do
     subcmd="${fixed_cmd} --seed ${seed}"

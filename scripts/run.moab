@@ -53,7 +53,7 @@ singularity exec mfhpo-simulator.sif python -m src.lcbench_local_config
 
 for seed in `seq ${seed_start} ${seed_end}`
 do
-    subcmd="./scripts/run.sh --seed_start ${seed} --seed_end ${seed} --n_workers ${n_workers} --opt_name ${opt_name}"
+    subcmd="./scripts/run.sh --seed_start ${seed} --seed_end ${seed} --n_workers ${n_workers} --opt_name ${opt_name} --tmp_dir ${TMPDIR}"
     if [[ "$opt_name" == "smac" ]]
     then
         sing="singularity exec mfhpo-simulator-for-smac.sif"
