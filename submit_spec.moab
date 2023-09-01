@@ -1,0 +1,50 @@
+#!/bin/bash -l
+
+#MSUB -l naccesspolicy=singlejob
+#MSUB -l nodes=1:ppn=8
+#MSUB -l walltime=2:00:00
+#MSUB -l mem=120gb
+
+run_cmd (){
+    cmd=${1}
+
+    echo `date '+%y/%m/%d %H:%M:%S'`
+    echo $cmd
+    $cmd
+    rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/
+    rm -r -f $TMPDIR/mfhpo-simulator-info/
+}
+
+module load tools/singularity/3.11
+
+mkdir $TMPDIR/hpo_benchmarks/
+mkdir $TMPDIR/hpo_benchmarks/hpobench/
+# --bench_name hpobench --dataset_id 3 for hyperband
+cp $HOME/hpo_benchmarks/hpobench/credit_g.pkl $TMPDIR/hpo_benchmarks/hpobench/
+# --bench_name hpobench --dataset_id 1 for smac
+cp -r $HOME/hpo_benchmarks/hpobench/blood_transfusion/ $TMPDIR/hpo_benchmarks/hpobench/
+# --bench_name jahs for dehb
+cp -r $HOME/hpo_benchmarks/jahs $TMPDIR/hpo_benchmarks/
+
+cd $HOME/master-thesis-experiment
+cmd="singularity exec mfhpo-simulator.sif python -m src.hyperband --n_workers 8 --tmp_dir ${TMPDIR} --bench_name hpobench --dataset_id 3 --seed 12"
+run_cmd "${cmd}"
+
+cmd="singularity exec mfhpo-simulator.sif python -m src.hyperband --n_workers 8 --tmp_dir ${TMPDIR} --bench_name hpobench --dataset_id 3 --seed 13"
+run_cmd "${cmd}"
+
+cmd="singularity exec mfhpo-simulator-for-smac.sif python -m src.smac --n_workers 8 --tmp_dir ${TMPDIR} --bench_name hpobench --dataset_id 1 --seed 1"
+run_cmd "${cmd}"
+
+subcmd="singularity exec mfhpo-simulator.sif python -m src.dehb --tmp_dir ${TMPDIR} --bench_name jahs"
+for seed in `seq 0 29`
+do
+    for n_workers in 4 8
+    do
+        for dataset_id in 0 1 2
+        do
+            cmd="${subcmd} --n_workers ${n_workers} --dataset_id ${dataset_id} --seed ${seed}"
+            run_cmd "${cmd}"
+        done
+    done
+done

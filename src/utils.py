@@ -302,6 +302,7 @@ def parse_args() -> ParsedArgs:
     parser.add_argument("--tmp_dir", type=str, default=None)
     parser.add_argument("--worker_index", type=int, default=None)
     args = parser.parse_args()
+    args.tmp_dir = None if args.tmp_dir == "" else args.tmp_dir
 
     kwargs = {k: getattr(args, k) for k in ParsedArgs.__annotations__.keys()}
     return ParsedArgs(**kwargs)
