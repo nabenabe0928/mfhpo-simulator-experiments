@@ -69,7 +69,7 @@ def run_neps(
         continual_max_fidel=max_fidel,
         seed=seed,
         expensive_sampler=True,
-        max_waiting_time=300.0,
+        max_waiting_time=1800.0,
         store_actual_cumtime=True,
         tmp_dir=tmp_dir,
         worker_index=worker_index,
