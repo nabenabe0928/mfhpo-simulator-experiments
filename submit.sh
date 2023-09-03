@@ -7,13 +7,13 @@ echo $cmd
 $cmd
 
 declare -A rsrc
-rsrc["bohb"]="walltime=8:00:00"
-rsrc["dehb"]="walltime=2:00:00"
-rsrc["smac"]="walltime=8:00:00"
-rsrc["random"]="walltime=24:00:00"
-rsrc["tpe"]="walltime=8:00:00"
-rsrc["hyperband"]="walltime=24:00:00"
-rsrc["neps"]="walltime=24:00:00"
+rsrc["bohb"]="walltime=4:00:00"
+rsrc["dehb"]="walltime=4:00:00"
+rsrc["smac"]="walltime=4:00:00"
+rsrc["random"]="walltime=4:00:00"
+rsrc["tpe"]="walltime=4:00:00"
+rsrc["hyperband"]="walltime=12:00:00"
+rsrc["neps"]="walltime=12:00:00"
 
 for seed in `seq 0 29`
 do

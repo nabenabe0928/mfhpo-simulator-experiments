@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 import warnings
 from typing import Any
@@ -68,7 +69,7 @@ def run_neps(
         continual_max_fidel=max_fidel,
         seed=seed,
         expensive_sampler=True,
-        max_waiting_time=180.0,
+        max_waiting_time=300.0,
         store_actual_cumtime=True,
         tmp_dir=tmp_dir,
         worker_index=worker_index,
@@ -76,6 +77,7 @@ def run_neps(
     pipeline_space = get_pipeline_space(config_space)
     pipeline_space[fidel_key] = neps.IntegerParameter(lower=min_fidel, upper=max_fidel, is_fidelity=True)
 
+    logging.basicConfig(level=logging.ERROR)
     neps.run(
         run_pipeline=worker,
         pipeline_space=pipeline_space,
