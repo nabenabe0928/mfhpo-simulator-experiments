@@ -8,4 +8,6 @@
 seed=${SEED}
 module load tools/singularity/3.11
 cd $HOME/master-thesis-experiment
-prefix="singularity exec mfhpo-simulator.sif python -m src.hebo --bench_name lc --n_workers 4 --dataset_id 14 --seed ${seed}"
+cmd="singularity exec mfhpo-simulator.sif python -m src.hebo --bench_name lc --n_workers 4 --dataset_id 14 --seed ${seed}"
+echo $cmd
+$cmd
