@@ -329,12 +329,19 @@ def is_completed(save_dir_name: str, opt_name: str) -> bool:
     return completed
 
 
+def os_walk(target: str):
+    for dir_path, _, file_names in os.walk(target):
+        if len(file_names) == 0:
+            continue
+        else:
+            yield dir_path, file_names
+
+
 def compress_files():
     prefix = "mfhpo-simulator-info/"
     lock_fn = "compress.lock"
     complete_count = {opt_name: 0 for opt_name in N_EVALS_DICT}
-    for count, loc in enumerate(os.walk(prefix), start=1):
-        dir_path, dir_names, file_names = loc
+    for count, (dir_path, file_names) in enumerate(os_walk(prefix), start=1):
         if "results.json" not in file_names:
             continue
 
@@ -369,8 +376,7 @@ def remove_failed_files():
     prefix = "mfhpo-simulator-info/"
     lock_fn = "complete.lock"
     complete_count = {opt_name: 0 for opt_name in N_EVALS_DICT}
-    for count, loc in enumerate(os.walk(prefix), start=1):
-        dir_path, dir_names, file_names = loc
+    for count, (dir_path, file_names) in enumerate(os_walk(prefix), start=1):
         if "results.json" not in file_names:
             continue
 
@@ -396,8 +402,7 @@ def cleanup_info():
     prefix = "mfhpo-simulator-info/"
     count = 0
     protected = ["results.json", "compress.lock", "complete.lock", "sampled_time.json"]
-    for loc in os.walk(prefix):
-        dir_path, dir_names, file_names = loc
+    for (dir_path, file_names) in os_walk(prefix):
         if "results.json" not in file_names:
             continue
 
