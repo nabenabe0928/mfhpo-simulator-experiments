@@ -7,35 +7,42 @@ echo $cmd
 $cmd
 
 submit_moab () {
-    cmd=${1}
+    seed=${1}
+    dataset_name=${2}
+    n_workers=${3}
 
+    declare -A name_to_id
+    name_to_id["cifar10"]=0
+    name_to_id["fashion-mnist"]=1
+    name_to_id["colorectal-histology"]=0
+
+    memlimit=$(($n_workers * 15))
+    cmd="msub run_neps_jahs.moab -l nodes=1:ppn=${n_workers},mem=${memlimit}gb -v SEED=${seed},N_WORKERS=${n_workers},DATASET_ID=${name_to_id[$dataset_name]}"
     echo $cmd
-    $cmd
+    # $cmd
 }
 
-for dataset_id in 0 1 2
+for seed in 3 10 14 25
 do
-    for seed in `seq 0 29`
-    do
-        cmd="msub run_neps_jahs.moab -l nodes=1:ppn=8,mem=120gb -v SEED=${seed},N_WORKERS=8,DATASET_ID=${dataset_id}"
-        echo $cmd
-        $cmd
-    done
+    submit_moab $seed "colorectal-histology" 4
 done
 
-# 0: cifar10, 1: fashion_mnist, 2: colorectal_histology
+for seed in 5 9 10 11 14 17 18 21 22 24 28
+do
+    submit_moab $seed "fashion-mnist" 8
+done
 
-cmd="msub run_neps_jahs.moab -l nodes=1:ppn=2,mem=30gb -v SEED=3,N_WORKERS=2,DATASET_ID=1"
-submit_moab "$cmd"
+for seed in 11 18
+do
+    submit_moab $seed "fashion-mnist" 4
+done
 
-cmd="msub run_neps_jahs.moab -l nodes=1:ppn=2,mem=30gb -v SEED=9,N_WORKERS=2,DATASET_ID=1"
-submit_moab "$cmd"
+for seed in 2 4 7 8 10 11 12 21 29
+do
+    submit_moab $seed "colorectal-histology" 8
+done
 
-cmd="msub run_neps_jahs.moab -l nodes=1:ppn=4,mem=60gb -v SEED=3,N_WORKERS=4,DATASET_ID=2"
-submit_moab "$cmd"
-
-cmd="msub run_neps_jahs.moab -l nodes=1:ppn=4,mem=60gb -v SEED=11,N_WORKERS=4,DATASET_ID=1"
-submit_moab "$cmd"
-
-cmd="msub run_neps_jahs.moab -l nodes=1:ppn=2,mem=30gb -v SEED=22,N_WORKERS=2,DATASET_ID=1"
-submit_moab "$cmd"
+for seed in 3 9 22
+do
+    submit_moab $seed "fashion-mnist" 2
+done
