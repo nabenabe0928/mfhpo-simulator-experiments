@@ -1,18 +1,19 @@
 #!/bin/bash -l
 #MSUB -l naccesspolicy=singlejob
 #MSUB -l walltime=6:00:00
+#MSUB -l nodes=1:ppn=8
+#MSUB -l mem=120gb
 
 module load tools/singularity/3.11
 
 seed=${SEED}
-n_workers=${N_WORKERS}
 dataset_id=${DATASET_ID}
 
 mkdir $TMPDIR/hpo_benchmarks/
 cp -r $HOME/hpo_benchmarks/jahs $TMPDIR/hpo_benchmarks/
 cd $HOME/master-thesis-experiment
 
-cmd="singularity exec mfhpo-simulator.sif python -m src.dehb --bench_name jahs --dataset_id ${dataset_id} --n_workers ${n_workers} --tmp_dir ${TMPDIR} --seed ${seed}"
+cmd="singularity exec mfhpo-simulator.sif python -m src.dehb --bench_name jahs --dataset_id ${dataset_id} --n_workers 8 --tmp_dir ${TMPDIR} --seed ${seed}"
 echo `date '+%y/%m/%d %H:%M:%S'`
 echo $cmd
 $cmd
