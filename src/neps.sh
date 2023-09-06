@@ -44,7 +44,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 for num in `seq 1 ${n_workers}`; do
-    python -m src.neps --seed $seed --dataset_id $dataset_id --bench_name $bench_name --n_workers $n_workers --worker_index $((num - 1)) --tmp_dir "${tmp_dir}" &
+    python -m src.neps --seed $seed --dataset_id $dataset_id --bench_name $bench_name --n_workers $n_workers --worker_index $((num - 1)) --tmp_dir "${tmp_dir}" --dim $dim &
     pids[${num}]=$!
     echo "Start Proc. $num"
 done
