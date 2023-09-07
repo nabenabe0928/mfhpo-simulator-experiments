@@ -86,13 +86,12 @@ class FixedRandomOpt:
         cumtimes = np.array([r[1] - start for r in self._observations])
         order = np.argsort(cumtimes)
         indices = np.array([r[0] for r in self._observations])
-        return indices[order]
+        return indices[order], cumtimes[order]
 
 
-def experiment(unittime: float = 0.0):
+def experiment(unittime: float = 0.0, avg_time: float = 5.0):
     results = {}
     expensive = "expensive" if unittime > 0.0 else "cheap"
-    avg_time = 5.0
     # make expectation 1 for everything except for Pareto distribution
     for dist, dist_kwargs, multiplier in zip(
         ["random", "exponential", "pareto", "lognormal"],
@@ -104,7 +103,7 @@ def experiment(unittime: float = 0.0):
         results[dist] = {}
         kwargs = dict(seed=0, dist=dist, dist_kwargs=dist_kwargs, multiplier=multiplier, unittime=unittime)
         opt = FixedRandomOpt(**kwargs)
-        answer = opt.run(dummy_func_with_sleep)
+        answer, _ = opt.run(dummy_func_with_sleep)
         results[dist]["answer"] = answer.tolist()
 
         opt = FixedRandomOpt(**kwargs, with_wrapper=True)
@@ -113,6 +112,7 @@ def experiment(unittime: float = 0.0):
             save_dir_name="validation-order-wrapper",
             tmp_dir="validation-results",
             store_config=True,
+            expensive_sampler=bool(unittime > 0.0),
         )
         opt.run(func)
         simulated_results = np.array(func.get_results()["config_id"])[:answer.size]
@@ -120,7 +120,7 @@ def experiment(unittime: float = 0.0):
         shutil.rmtree("validation-results/mfhpo-simulator-info/validation-order-wrapper/")
 
         opt = FixedRandomOpt(**kwargs)
-        random_results = opt.run(dummy_func)
+        random_results, _ = opt.run(dummy_func)
         results[dist]["random"] = random_results.tolist()
 
     with open(f"validation-results/order-match-{expensive}-results.json", mode="w") as f:
