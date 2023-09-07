@@ -13,7 +13,7 @@ rsrc["smac"]="walltime=4:00:00"
 rsrc["random"]="walltime=4:00:00"
 rsrc["tpe"]="walltime=4:00:00"
 rsrc["hyperband"]="walltime=12:00:00"
-rsrc["neps"]="walltime=12:00:00"
+rsrc["neps"]="walltime=20:00:00"
 
 for seed in `seq 0 29`
 do
