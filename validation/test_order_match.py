@@ -1,22 +1,13 @@
 from __future__ import annotations
 
 import json
-import multiprocessing
 import shutil
 import time
-from contextlib import contextmanager
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 
 from benchmark_simulator import ObjectiveFuncWrapper
 
 import numpy as np
-
-
-@contextmanager
-def get_pool(n_workers: int) -> multiprocessing.Pool:
-    pool = multiprocessing.Pool(processes=n_workers)
-    yield pool
-    pool.close()
-    pool.join()
 
 
 def dummy_func(eval_config: dict[str, int], *args, **kwargs) -> dict[str, float]:
@@ -42,32 +33,66 @@ class FixedRandomOpt:
         n_evals: int = 100,
         n_workers: int = 4,
         with_wrapper: bool = False,
+        unittime: float = 0.0,
     ):
         self._rng = np.random.RandomState(seed)
         self._n_workers = n_workers
         self._n_actual_evals = n_evals + n_workers
         self._n_evals = n_evals
-        self._runtimes = getattr(self._rng, dist)(size=self._n_actual_evals, **dist_kwargs) * multiplier + 0.1
-        self._runtimes[-n_workers:] = 10 ** 5
+        runtimes = getattr(self._rng, dist)(size=self._n_actual_evals, **dist_kwargs) * multiplier + 0.1
+        runtimes[-n_workers:] = 10 ** 5
+        self._runtimes = runtimes.tolist()[::-1]
         self._with_wrapper = with_wrapper
+        self._observations = []
+        self._unittime = unittime
+
+    def ask(self) -> dict[str, int]:
+        waiting_time = (len(self._observations) + 1) * self._unittime
+        if len(self._runtimes):
+            time.sleep(waiting_time)
+            return self._runtimes.pop()
+        else:
+            return 10**5
+
+    def _pop_completed(self, futures) -> None:
+        completed, _ = wait(futures.keys(), return_when=FIRST_COMPLETED)
+        for future in completed:
+            config_id = futures[future]
+            try:
+                results = future.result()
+            except Exception as e:
+                raise RuntimeError(f"An exception occurred: {e}")
+            else:
+                self._observations.append((config_id, results["loss"]))
+
+            futures.pop(future)
 
     def run(self, func) -> None:
-        results = []
+        futures = {}
+        counts = 0
         start = time.time()
         n_evals = self._n_actual_evals if self._with_wrapper else self._n_evals
-        with get_pool(n_workers=self._n_workers) as pool:
-            for idx in range(n_evals):
-                r = pool.apply_async(func, kwds=dict(eval_config=dict(x=self._runtimes[idx], config_id=idx)))
-                results.append(r)
-            cumtimes = np.array([r.get()["loss"] - start for r in results])
+        with ProcessPoolExecutor(max_workers=self._n_workers) as executor:
+            while len(self._observations) < n_evals:
+                if self._n_workers <= counts <= n_evals - self._n_workers or counts == n_evals:
+                    self._pop_completed(futures)
 
+                if counts < n_evals:
+                    x = self.ask()
+                    futures[executor.submit(func, dict(x=x, config_id=counts))] = counts
+                    time.sleep(1e-3)
+                    counts += 1
+
+        cumtimes = np.array([r[1] - start for r in self._observations])
         order = np.argsort(cumtimes)
-        return np.arange(n_evals)[order]
+        indices = np.array([r[0] for r in self._observations])
+        return indices[order]
 
 
-if __name__ == "__main__":
+def experiment(unittime: float = 0.0):
     results = {}
-    avg_time = 10.0
+    expensive = "expensive" if unittime > 0.0 else "cheap"
+    avg_time = 5.0
     # make expectation 1 for everything except for Pareto distribution
     for dist, dist_kwargs, multiplier in zip(
         ["random", "exponential", "pareto", "lognormal"],
@@ -77,7 +102,7 @@ if __name__ == "__main__":
         print(f"Start {dist=}")
         multiplier *= avg_time
         results[dist] = {}
-        kwargs = dict(seed=0, dist=dist, dist_kwargs=dist_kwargs, multiplier=multiplier)
+        kwargs = dict(seed=0, dist=dist, dist_kwargs=dist_kwargs, multiplier=multiplier, unittime=unittime)
         opt = FixedRandomOpt(**kwargs)
         answer = opt.run(dummy_func_with_sleep)
         results[dist]["answer"] = answer.tolist()
@@ -98,5 +123,10 @@ if __name__ == "__main__":
         random_results = opt.run(dummy_func)
         results[dist]["random"] = random_results.tolist()
 
-    with open("validation-results/order-match-results.json", mode="w") as f:
+    with open(f"validation-results/order-match-{expensive}-results.json", mode="w") as f:
         json.dump(results, f, indent=4)
+
+
+if __name__ == "__main__":
+    experiment()
+    experiment(unittime=0.05)
