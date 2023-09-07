@@ -123,6 +123,9 @@ def experiment(unittime: float = 0.0, avg_time: float = 5.0):
         random_results, _ = opt.run(dummy_func)
         results[dist]["random"] = random_results.tolist()
 
+    if expensive == "expensive" and unittime * 200 < avg_time:
+        expensive = "bit-expensive"
+
     with open(f"validation-results/order-match-{expensive}-results.json", mode="w") as f:
         json.dump(results, f, indent=4)
 
@@ -130,3 +133,4 @@ def experiment(unittime: float = 0.0, avg_time: float = 5.0):
 if __name__ == "__main__":
     experiment()
     experiment(unittime=0.05)
+    experiment(unittime=0.005)
