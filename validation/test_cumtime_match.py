@@ -54,7 +54,7 @@ class Optimizer:
         counts = 0
         with ProcessPoolExecutor(max_workers=self._n_workers) as executor:
             while self._n_observations < self._n_evals:
-                if self._n_workers <= counts <= self._n_evals - self._n_workers or counts == self._n_evals:
+                if counts == self._n_evals or len(futures) >= self._n_workers:
                     self._pop_completed(futures)
 
                 if counts < self._n_evals:

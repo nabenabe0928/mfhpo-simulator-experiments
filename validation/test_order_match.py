@@ -74,7 +74,7 @@ class FixedRandomOpt:
         n_evals = self._n_actual_evals if self._with_wrapper else self._n_evals
         with ProcessPoolExecutor(max_workers=self._n_workers) as executor:
             while len(self._observations) < n_evals:
-                if self._n_workers <= counts <= n_evals - self._n_workers or counts == n_evals:
+                if counts == n_evals or len(futures) >= self._n_workers:
                     self._pop_completed(futures)
 
                 if counts < n_evals:
