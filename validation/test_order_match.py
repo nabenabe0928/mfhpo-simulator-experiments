@@ -112,6 +112,8 @@ def experiment(unittime: float = 0.0, avg_time: float = 5.0):
             save_dir_name="validation-order-wrapper",
             tmp_dir="validation-results",
             store_config=True,
+            # If expensive_sampler=False for expensive ones, since |D| does not catch up with the real number,
+            # sampling times will be underestimated, and hence the overall runtime will be smaller.
             expensive_sampler=bool(unittime > 0.0),
         )
         opt.run(func)

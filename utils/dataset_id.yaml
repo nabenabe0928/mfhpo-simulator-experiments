@@ -1,0 +1,53 @@
+hpobench:
+  australian: 0
+  blood_transfusion: 1
+  car: 2
+  credit_g: 3
+  kc1: 4
+  phoneme: 5
+  segment: 6
+  vehicle: 7
+hpolib:
+  slice_localization: 0
+  protein_structure: 1
+  naval_propulsion: 2
+  parkinsons_telemonitoring: 3
+jahs:
+  cifar10: 0
+  fashion_mnist: 1
+  colorectal_histology: 2
+lcbench:
+  kddcup09_appetency: 0
+  covertype: 1
+  amazon_employee_access: 2
+  adult: 3
+  nomao: 4
+  bank_marketing: 5
+  shuttle: 6
+  australian: 7
+  kr_vs_kp: 8
+  mfeat_factors: 9
+  credit_g: 10
+  vehicle: 11
+  kc1: 12
+  blood_transfusion_service_center: 13
+  cnae_9: 14
+  phoneme: 15
+  higgs: 16
+  connect_4: 17
+  helena: 18
+  jannis: 19
+  volkert: 20
+  mini_boo_ne: 21
+  aps_failure: 22
+  christine: 23
+  fabert: 24
+  airlines: 25
+  jasmine: 26
+  sylvine: 27
+  albert: 28
+  dionis: 29
+  car: 30
+  segment: 31
+  fashion_mnist: 32
+  jungle_chess_2pcs_raw_endgame_complete: 33
