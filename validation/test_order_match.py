@@ -44,9 +44,11 @@ class FixedRandomOpt:
         self._runtimes = runtimes.tolist()[::-1]
         self._with_wrapper = with_wrapper
         self._observations = []
+        self.size_traj = []
         self._unittime = unittime
 
     def ask(self) -> dict[str, int]:
+        self.size_traj.append(len(self._observations))
         waiting_time = (len(self._observations) + 1) * self._unittime
         if len(self._runtimes):
             time.sleep(waiting_time)
@@ -91,6 +93,7 @@ class FixedRandomOpt:
 
 def experiment(unittime: float = 0.0, avg_time: float = 5.0):
     results = {}
+    size_traj = {}
     expensive = "expensive" if unittime > 0.0 else "cheap"
     # make expectation 1 for everything except for Pareto distribution
     for dist, dist_kwargs, multiplier in zip(
@@ -101,10 +104,12 @@ def experiment(unittime: float = 0.0, avg_time: float = 5.0):
         print(f"Start {dist=}")
         multiplier *= avg_time
         results[dist] = {}
+        size_traj[dist] = {}
         kwargs = dict(seed=0, dist=dist, dist_kwargs=dist_kwargs, multiplier=multiplier, unittime=unittime)
         opt = FixedRandomOpt(**kwargs)
         answer, _ = opt.run(dummy_func_with_sleep)
         results[dist]["answer"] = answer.tolist()
+        size_traj[dist]["answer"] = opt.size_traj
 
         opt = FixedRandomOpt(**kwargs, with_wrapper=True)
         func = ObjectiveFuncWrapper(
@@ -119,17 +124,21 @@ def experiment(unittime: float = 0.0, avg_time: float = 5.0):
         opt.run(func)
         simulated_results = np.array(func.get_results()["config_id"])[:answer.size]
         results[dist]["simulated"] = simulated_results.tolist()
+        size_traj[dist]["simulated"] = opt.size_traj
         shutil.rmtree("validation-results/mfhpo-simulator-info/validation-order-wrapper/")
 
         opt = FixedRandomOpt(**kwargs)
-        random_results, _ = opt.run(dummy_func)
-        results[dist]["random"] = random_results.tolist()
+        # random_results, _ = opt.run(dummy_func)
+        # results[dist]["random"] = random_results.tolist()
 
     if expensive == "expensive" and unittime * 200 < avg_time:
         expensive = "bit-expensive"
 
-    with open(f"validation-results/order-match-{expensive}-results.json", mode="w") as f:
-        json.dump(results, f, indent=4)
+    # with open(f"validation-results/order-match-{expensive}-results.json", mode="w") as f:
+    #     json.dump(results, f, indent=4)
+
+    with open(f"validation-results/order-match-{expensive}-size-traj.json", mode="w") as f:
+        json.dump(size_traj, f, indent=4)
 
 
 if __name__ == "__main__":
