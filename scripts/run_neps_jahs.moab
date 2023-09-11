@@ -1,0 +1,19 @@
+#!/bin/bash -l
+#MSUB -l naccesspolicy=singlejob
+#MSUB -l walltime=2:00:00
+
+module load tools/singularity/3.11
+
+seed=${SEED}
+n_workers=${N_WORKERS}
+dataset_id=${DATASET_ID}
+
+mkdir $TMPDIR/hpo_benchmarks/
+cp -r $HOME/hpo_benchmarks/jahs $TMPDIR/hpo_benchmarks/
+cd $HOME/master-thesis-experiment
+
+cmd="singularity exec mfhpo-simulator.sif ./src/neps.sh --bench_name jahs --dataset_id ${dataset_id} --n_workers ${n_workers} --tmp_dir ${TMPDIR} --seed ${seed}"
+echo `date '+%y/%m/%d %H:%M:%S'`
+echo $cmd
+$cmd
+rsync -a $TMPDIR/mfhpo-simulator-info/ mfhpo-simulator-info/

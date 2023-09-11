@@ -17,7 +17,7 @@ submit_moab () {
     name_to_id["colorectal-histology"]=2
 
     memlimit=$(($n_workers * 15))
-    cmd="msub scripts/run_dehb_jahs.moab -l nodes=1:ppn=${n_workers},mem=${memlimit}gb -v SEED=${seed},N_WORKERS=${n_workers},DATASET_ID=${name_to_id[$dataset_name]}"
+    cmd="msub scripts/run_neps_jahs.moab -l nodes=1:ppn=${n_workers},mem=${memlimit}gb -v SEED=${seed},N_WORKERS=${n_workers},DATASET_ID=${name_to_id[$dataset_name]}"
     echo $cmd
     $cmd
 }
