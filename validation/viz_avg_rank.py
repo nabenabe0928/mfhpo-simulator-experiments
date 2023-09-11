@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from benchmark_simulator.utils._performance_over_time import get_average_rank
+from benchmark_simulator.utils import get_average_rank
 
 import os
 

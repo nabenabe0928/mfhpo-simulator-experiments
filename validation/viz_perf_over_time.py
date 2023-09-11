@@ -78,7 +78,8 @@ def plot_perf_over_time(
         fancybox=False,
         ncol=(len(labels) + 1) // 2,
     )
-    file_name = f"figs/perf-over-time/{dataset_name if dataset_name is not None else bench_name}.pdf"
+    bench_name += f"-{dataset_name}" if dataset_name is not None else ""
+    file_name = f"figs/perf-over-time/{bench_name}.pdf"
     plt.savefig(file_name, bbox_inches="tight")
 
 

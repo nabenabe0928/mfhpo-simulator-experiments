@@ -3,7 +3,7 @@ numpy<=1.23.5
 pymoo==0.5.0
 
 # My wrapper
-mfhpo-simulator>=1.4.0
+mfhpo-simulator>=1.4.2
 
 # BOHB
 hpbandster==0.7.4
