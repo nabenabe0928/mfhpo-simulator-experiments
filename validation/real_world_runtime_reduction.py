@@ -7,6 +7,11 @@ import ujson as json
 from validation.constants import DATASET_NAMES, OPT_DICT
 
 
+BENCH_DICT = dict(
+    lc="LCBench", hpolib="HPOlib", hpobench="HPOBench", jahs="JAHS-Bench-201", synfn="synthetic functions"
+)
+
+
 def collect_data() -> tuple[dict[str, float], dict[str, float]]:
     # opt x dataset
     sim_times = {}
@@ -47,17 +52,23 @@ def generate_table(data_part: str, opt_name: str, bench_name: str) -> str:
         "\\addtolength{\\tabcolsep}{-5pt}",
         "\\begin{table}[t]",
         "\\begin{center}",
-        "\\caption{" + f"{OPT_DICT[opt_name]} on {bench_name}" + "}",
-        "\\label{}",
-        "\\begin{tabular}{c|cc|cc|cc|cc|}",
+        "\\caption{",
+        f"Actual and simulated runtimes for {OPT_DICT[opt_name]} on {BENCH_DICT[bench_name]}.",
+        "}",
+        "\\label{appx:additional-results:tab:" + f"{opt_name}-on-{bench_name}" + "}",
+        "\\makebox[0.98 \\textwidth][c]{",
+        "\\resizebox{0.98 \\textwidth}{!}{"
+        "\\begin{tabular}{c|ccc|ccc|ccc|ccc|}",
         "\\toprule",
-        "\\multirow{2}{*}{ID}" + "".join(["&\\multicolumn{2}{c|}" + h for h in headers]) + "\\\\",
-        "&Act.& Sim." * 4 + "\\\\",
+        "\\multirow{2}{*}{ID}" + "".join(["&\\multicolumn{3}{c|}" + h for h in headers]) + "\\\\",
+        "&Act.& Sim.&$\\times$~Fast" * 4 + "\\\\",
         "\\midrule",
     ])
     second_half = "\n".join([
         "\\bottomrule",
         "\\end{tabular}",
+        "}",
+        "}",
         "\\end{center}",
         "\\end{table}",
         "\\addtolength{\\tabcolsep}{5pt}"
@@ -80,7 +91,8 @@ def get_data_part(
             not_exist = key not in sim_times
             st = "--" if not_exist else "e+".join(f'{sim_times[key]/30.0:.1e}'.split("e+0"))
             at = "--" if not_exist else "e+".join(f'{act_times[key]/30.0:.1e}'.split("e+0"))
-            row += f"&{at}&{st}" if not_exist else f"&{at}/&{st}"
+            ratio = "--" if not_exist else "e+".join(f'{sim_times[key]/act_times[key]:.1e}'.split("e+0"))
+            row += f"&{at}&{st}&{ratio}" if not_exist else f"&{at}/&{st}/&{ratio}"
         row += "\\\\"
         rows.append(row)
 
@@ -95,7 +107,13 @@ def compute_overall_reduction(sim_times: dict[str, float], act_times: dict[str, 
 if __name__ == "__main__":
     sim_times, act_times = collect_data()
     kwargs = dict(sim_times=sim_times, act_times=act_times)
-    for bench_name in ["hpolib", "hpobench", "jahs", "lc"]:
+    suffixes = ["branin", "hartmann3d", "hartmann6d"]
+    for opt_name in OPT_DICT:
+        data_part = get_data_part(suffixes=suffixes, opt_name=opt_name, **kwargs)
+        print(generate_table(data_part=data_part, opt_name=opt_name, bench_name="synfn"))
+        print()
+
+    for bench_name in ["hpobench", "hpolib", "jahs", "lc"]:
         suffixes = [
             f"{bench_name}:{dn}" for dn in DATASET_NAMES[bench_name]
         ]
@@ -105,10 +123,6 @@ if __name__ == "__main__":
 
             data_part = get_data_part(suffixes=suffixes, opt_name=opt_name, **kwargs)
             print(generate_table(data_part=data_part, opt_name=opt_name, bench_name=bench_name))
-
-    suffixes = ["branin", "hartmann3d", "hartmann6d"]
-    for opt_name in OPT_DICT:
-        data_part = get_data_part(suffixes=suffixes, opt_name=opt_name, **kwargs)
-        print(generate_table(data_part=data_part, opt_name=opt_name, bench_name=bench_name))
+            print()
 
     compute_overall_reduction(sim_times=sim_times, act_times=act_times)
