@@ -92,6 +92,9 @@ def get_data_part(
             st = "--" if not_exist else "e+".join(f'{sim_times[key]/30.0:.1e}'.split("e+0"))
             at = "--" if not_exist else "e+".join(f'{act_times[key]/30.0:.1e}'.split("e+0"))
             ratio = "--" if not_exist else "e+".join(f'{sim_times[key]/act_times[key]:.1e}'.split("e+0"))
+            if not not_exist and sim_times[key] / act_times[key] < 1.0:
+                ratio = "\\textbf{" + ratio + "}"
+
             row += f"&{at}&{st}&{ratio}" if not_exist else f"&{at}/&{st}/&{ratio}"
         row += "\\\\"
         rows.append(row)
@@ -102,6 +105,22 @@ def get_data_part(
 def compute_overall_reduction(sim_times: dict[str, float], act_times: dict[str, float]) -> None:
     sim_total, act_total = sum(v for v in sim_times.values()), sum(v for v in act_times.values())
     print(f"{sim_total=:.3e}, {act_total=:.3e}, {(sim_total/act_total)=:.3e}")
+
+
+def data_part_for_main(sim_times: dict[str, float], act_times: dict[str, float]) -> str:
+    sim_total = {i: 0.0 for i in [1, 2, 4, 8]}
+    act_total = {i: 0.0 for i in [1, 2, 4, 8]}
+    for k in sim_times:
+        n_workers = int(k[-1])
+        sim_total[n_workers] += sim_times[k]
+        act_total[n_workers] += act_times[k]
+
+    row = ""
+    for n_workers in [1, 2, 4, 8]:
+        ratio = sim_total[n_workers] / act_total[n_workers]
+        row += f"&{act_total[n_workers]:.1e}/&{sim_total[n_workers]:.1e}/&{ratio:.1e}"
+    row += "\\\\"
+    return row
 
 
 if __name__ == "__main__":
@@ -125,4 +144,6 @@ if __name__ == "__main__":
             print(generate_table(data_part=data_part, opt_name=opt_name, bench_name=bench_name))
             print()
 
+    data_part = data_part_for_main(sim_times=sim_times, act_times=act_times)
+    print(generate_table(data_part=data_part, opt_name=opt_name, bench_name=bench_name))
     compute_overall_reduction(sim_times=sim_times, act_times=act_times)

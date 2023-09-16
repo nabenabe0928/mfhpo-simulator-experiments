@@ -6,34 +6,7 @@ import os
 
 import matplotlib.pyplot as plt
 
-from validation.constants import COLOR_DICT, DATASET_NAMES, LS_DICT, OPT_DICT
-
-
-def get_name(
-    opt_name: str,
-    bench_name: str,
-    dataset_name: str,
-    n_workers: int,
-    seed: int,
-) -> str:
-    return f"mfhpo-simulator-info/{opt_name}/bench={bench_name}_dataset={dataset_name}_nworkers={n_workers}/{seed}"
-
-
-def get_all_path_list(bench_name: str, n_workers: int) -> list[list[list[str]]]:
-    return [
-        [
-            [
-                get_name(
-                    opt_name=opt_name,
-                    seed=seed,
-                    bench_name=bench_name,
-                    dataset_name=dataset_name,
-                    n_workers=n_workers,
-                )
-                for seed in range(30)
-            ] for opt_name in OPT_DICT if opt_name != "smac" or bench_name not in ["lc", "jahs"]
-        ] for dataset_name in DATASET_NAMES[bench_name]
-    ]
+from validation.constants import COLOR_DICT, LS_DICT, OPT_DICT, get_all_path_list
 
 
 def plot_average_rank(bench_name: str):

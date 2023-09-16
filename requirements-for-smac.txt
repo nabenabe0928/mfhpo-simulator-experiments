@@ -3,6 +3,9 @@ mfhpo-simulator>=1.4.2
 # Benchmark (SMAC3 cannot handle YAHPO and JAHS due to the ConfigSpace version incompatibility)
 mfhpo-benchmark-api>=2.2.2
 
+# Posthoc analysis for rank test
+git+https://github.com/maximtrp/scikit-posthocs.git
+
 # SMAC3 <=== cannot use it with JAHS
 smac>=2.0.1
 
