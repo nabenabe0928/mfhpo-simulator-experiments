@@ -11,7 +11,7 @@ plt.rcParams['mathtext.fontset'] = 'stix'  # The setting of math font
 
 OPT_DICT = {
     "random": "Random",
-    "hyperband": "Hyperband",
+    "hyperband": "HyperBand",
     "tpe": "TPE",
     "bohb": "BOHB",
     "hebo": "HEBO",
