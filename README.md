@@ -7,9 +7,6 @@ To reproduce our experiments, run the following on NEMO cluster:
 ```shell
 # Install the dependencies.
 $ pip install -r requirements.txt
-
-# Run all the experiments.
-$ ./scripts/submit.sh
 ```
 > [!TIP]
 > If `singularity` is available, you can install the dependencies via `sudo singularity build mfhpo-simulator.sif mfhpo-simulator.def` as well.
@@ -22,7 +19,13 @@ $ ./scripts/submit.sh
 
 ## Run Our Experiments
 
-If you are not using the MOAB architecture, each experiment can be run by the following commands as well:
+If you are using a cluster with the MOAB architecture, all the experiments are simply run by:
+
+```shell
+$ ./scripts/submit.sh
+```
+
+If you are not using the MOAB architecture, each experiment can be run by the following commands as well although you need to iterate over all the conditions:
 
 ```shell
 # We used seed from 0 to 29.
@@ -31,6 +34,9 @@ seed=0
 n_workers=4
 # We have {lc,hpobench,hpolib,jahs,branin,hartmann}.
 bench_cond="--bench_name hpolib --dataset_id 0"  # An example.
+# tmp_dir is typically necessary for cluster computation to reduce the filesystem burden.
+# If you are using your local computer, this variable can be simply omitted.
+tmp_dir=$TMPDIR
 
 # Benchmark conditions.
 # bench_cond="--bench_name lc --dataset_id 0"  # dataset_id must be in {0, 1, ..., 33}.
