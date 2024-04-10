@@ -17,6 +17,7 @@ import scikit_posthocs as sp
 
 
 MAX_POWER_FACTOR = 10
+OPT_DICT.update(random="Random(x10)", hyperband="HyperBand(x10)", neps="NePS-HB")
 
 
 def rank_test_with_n_workers(ax: plt.Axes, n_workers: int, budget_index: int, with_smac: bool) -> None:
