@@ -1,5 +1,7 @@
 # Reproducing Our Results
 
+## Install Dependencies
+
 To reproduce our experiments, run the following on NEMO cluster:
 
 ```shell
@@ -9,11 +11,16 @@ $ pip install -r requirements.txt
 # Run all the experiments.
 $ ./scripts/submit.sh
 ```
+> [!TIP]
+> If `singularity` is available, you can install the dependencies via `sudo singularity build mfhpo-simulator.sif mfhpo-simulator.def` as well.
+
 > [!NOTE]
 > The simulator module is available at [mfhpo-simulator](https://github.com/nabenabe0928/mfhpo-simulator).
 
 > [!IMPORTANT]
 > As SMAC3 is not compatible with JAHS-Bench-201 and LCBench, we need to prepare for another enviroment for SMAC3 by `$ pip install -r requirements-for-smac.txt`.
+
+## Run Our Experiments
 
 If you are not using the MOAB architecture, each experiment can be run by the following commands as well:
 
@@ -54,4 +61,38 @@ $ python -m src.hyperband --n_workers $n_workers --seed $seed --tmp_dir $tmp_dir
 
 # An Experiment for NePS.
 $ ./src/neps.sh --n_workers $n_workers --seed $seed --tmp_dir $tmp_dir $bench_cond
+
+# Small Experiments.
+# The Experiments for Figures 3 and 4.
+$ python -m validation.test_order_match
+
+# The Experiments for Figure 5.
+$ python -m validation.test_line_match
+
+# Experiments not in the paper.
+$ python -m validation.test_cumtime_match
 ```
+
+## Visualize Our Results
+
+### Figures and Tables in the Paper
+
+These visualizations require all the experiments by each optimizer.
+- [Table of Overall Runtime Reduction (Table 1)](validation/real_world_runtime_reduction.py)
+- [Critical Difference Diagrams (Figure 6)](validation/rank_test.py)
+
+These visualizations require small experiments mentioned above.
+- [Visualization of the Order Match (Figure 3)](validation/viz_order_match.ipynb)
+- [Trajectory Match of the Cumulative Runtime (Figure 4)](validation/viz_cumtime_match_large.ipynb)
+- [Trajectory Match of Performance over Time (Figure 5)](validation/viz_runtime_reduction.py)
+
+### The Figures and Tables Not in the Paper.
+
+These visualizations require all the experiments by each optimizer.
+- [Visualization of Average Rank over Cumulative Runtime](validation/viz_avg_rank.py)
+- [Table of Runtime Reduction for Each Benchmark](validation/create_latex_code_for_perf_over_time.py)
+
+These visualizations require small experiments mentioned above.
+- [Visualization of the Cumulative Runtime Match with Very Small Examples](validation/viz_cumtime_match.ipynb)
+- [Visualization of Performance Over Runtime for Each Benchmark](validation/viz_perf_over_time.py)
+- [Visualization of the Dataset Size Trajectory Match](validation/viz_size_traj_match.ipynb)
