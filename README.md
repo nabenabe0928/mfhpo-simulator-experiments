@@ -81,10 +81,23 @@ These visualizations require all the experiments by each optimizer.
 - [Table of Overall Runtime Reduction (Table 1)](validation/real_world_runtime_reduction.py)
 - [Critical Difference Diagrams (Figure 6)](validation/rank_test.py)
 
+```shell
+# Table of Overall Runtime Reduction (Table 1).
+$ python -m validation.real_world_runtime_reduction
+
+# Critical Difference Diagrams (Figure 6).
+$ python -m validation.rank_test
+```
+
 These visualizations require small experiments mentioned above.
 - [Visualization of the Order Match (Figure 3)](validation/viz_order_match.ipynb)
 - [Trajectory Match of the Cumulative Runtime (Figure 4)](validation/viz_cumtime_match_large.ipynb)
 - [Trajectory Match of Performance over Time (Figure 5)](validation/viz_runtime_reduction.py)
+
+```shell
+# Trajectory Match of Performance over Time (Figure 5).
+$ python -m validation.viz_runtime_reduction
+```
 
 ### The Figures and Tables Not in the Paper.
 
@@ -92,7 +105,20 @@ These visualizations require all the experiments by each optimizer.
 - [Visualization of Average Rank over Cumulative Runtime](validation/viz_avg_rank.py)
 - [Table of Runtime Reduction for Each Benchmark](validation/create_latex_code_for_perf_over_time.py)
 
+```shell
+# Visualization of Average Rank over Cumulative Runtime.
+$ python -m validation.viz_avg_rank
+
+# Table of Runtime Reduction for Each Benchmark.
+$ python -m validation.create_latex_code_for_perf_over_time
+```
+
 These visualizations require small experiments mentioned above.
 - [Visualization of the Cumulative Runtime Match with Very Small Examples](validation/viz_cumtime_match.ipynb)
 - [Visualization of Performance Over Runtime for Each Benchmark](validation/viz_perf_over_time.py)
 - [Visualization of the Dataset Size Trajectory Match](validation/viz_size_traj_match.ipynb)
+
+```shell
+# Visualization of Performance Over Runtime for Each Benchmark.
+$ python -m validation.viz_perf_over_time
+```
