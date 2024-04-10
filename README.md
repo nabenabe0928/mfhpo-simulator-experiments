@@ -25,6 +25,9 @@ If you are using a cluster with the MOAB architecture, all the experiments are s
 $ ./scripts/submit.sh
 ```
 
+> [!NOTE]
+> All the results will be stored in `mfhpo-simulator-info/` directory created by our wrapper.
+
 If you are not using the MOAB architecture, each experiment can be run by the following commands as well although you need to iterate over all the conditions:
 
 ```shell
